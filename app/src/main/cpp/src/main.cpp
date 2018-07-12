@@ -20,15 +20,46 @@
 /********************************************************************************/
 
 #include <DSK.hpp>
+#include <jni.h>
+#include <string>
 
 using namespace std;
 
 /********************************************************************************/
 
-int main (int argc, char* argv[])
-{
-    // We define a try/catch block in case some method fails (bad filename for instance)
-    try
+//int main (int argc, char* argv[])
+//{
+//    // We define a try/catch block in case some method fails (bad filename for instance)
+//    try
+//    {
+//        /** We execute dsk. */
+//        DSK().run (argc, argv);
+//    }
+//
+//    catch (OptionFailure& e)
+//    {
+//        return e.displayErrors (std::cout);
+//    }
+//
+//    catch (Exception& e)
+//    {
+//        cerr << "EXCEPTION: " << e.getMessage() << endl;
+//        return EXIT_FAILURE;
+//    }
+//
+//    return EXIT_SUCCESS;
+//}
+
+
+extern "C"
+JNIEXPORT jstring JNICALL
+Java_mo_bioinf_bmark_MainActivity_stringFromJNI(JNIEnv *env, jobject instance) {
+
+    char **argv;
+
+
+    std::string hello = "Howdy from DSK";
+        try
     {
         /** We execute dsk. */
         DSK().run (argc, argv);
@@ -36,15 +67,12 @@ int main (int argc, char* argv[])
 
     catch (OptionFailure& e)
     {
-        return e.displayErrors (std::cout);
+        hello = e.toString();
     }
 
-    catch (Exception& e)
-    {
-        cerr << "EXCEPTION: " << e.getMessage() << endl;
-        return EXIT_FAILURE;
-    }
 
-    return EXIT_SUCCESS;
+
+    //std::string hello = "Howdy from DSK";
+    return env->NewStringUTF(hello.c_str());
 }
 

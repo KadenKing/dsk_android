@@ -15,23 +15,23 @@ public class MainActivity extends AppCompatActivity {
 
     // Used to load the 'native-lib' library on application startup.
     static {
-        System.loadLibrary("bcalm");
+        System.loadLibrary("dsk");
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        String x = stringFromJNI();
         // Example of a call to a native method
         TextView tv = (TextView) findViewById(R.id.sample_text);
         checkPermission();
-        if (tryOpenFile() /*&& isExternalStorageReadable() && isExternalStorageWritable()*/) {
+        if (tryOpenFile() && isExternalStorageReadable() && isExternalStorageWritable()) {
             stringFromJNI();
             tv.setText("provo");
         }
         else {
-            tv.setText("Kaden edit - cannot open file");
+            tv.setText(x);
         }
 
     }

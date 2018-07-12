@@ -71,7 +71,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 include_directories (${PROGRAM_SOURCE_DIR})
 file (GLOB_RECURSE  ProjectFiles  ${PROGRAM_SOURCE_DIR}/*)
-add_executable(${PROJECT_NAME} ${ProjectFiles})
+add_library(${PROJECT_NAME} SHARED ${ProjectFiles})
 target_link_libraries(${PROJECT_NAME} ${gatb-core-libraries})
 
 

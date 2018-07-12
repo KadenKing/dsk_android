@@ -1,6 +1,7 @@
 /*****************************************************************************
  *   GATB : Genome Assembly Tool Box
  *   Copyright (C) 2014  INRIA
+ *   Authors: R.Chikhi, G.Rizk, E.Drezen
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -16,39 +17,34 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *****************************************************************************/
 
-// We include the header file for the tool
-#include <bcalm_1.hpp>
+/********************************************************************************/
+
+#include <DSK.hpp>
+
+using namespace std;
 
 /********************************************************************************/
 
-#include <jni.h>
-#include <string>
+int main (int argc, char* argv[])
+{
+    // We define a try/catch block in case some method fails (bad filename for instance)
+    try
+    {
+        /** We execute dsk. */
+        DSK().run (argc, argv);
+    }
 
+    catch (OptionFailure& e)
+    {
+        return e.displayErrors (std::cout);
+    }
 
+    catch (Exception& e)
+    {
+        cerr << "EXCEPTION: " << e.getMessage() << endl;
+        return EXIT_FAILURE;
+    }
 
-//int main (int argc, char* argv[])
-//{
-//    try
-//    {
-//        // We run the tool with the provided command line arguments.
-//        bcalm_1().run (argc, argv);
-//    }
-//    catch (Exception& e)
-//    {
-//        std::cout << "EXCEPTION: " << e.getMessage() << std::endl;
-//        return EXIT_FAILURE;
-//    }
-//
-//    return EXIT_SUCCESS;
-//}
-
-extern "C"
-JNIEXPORT jstring JNICALL
-Java_mo_bioinf_bmark_MainActivity_stringFromJNI(JNIEnv *env, jobject instance) {
-
-    char **argv;
-    bcalm_1().run (1, argv);
-
-    std::string hello = "Hello from C++";
-    return env->NewStringUTF(hello.c_str());
+    return EXIT_SUCCESS;
 }
+

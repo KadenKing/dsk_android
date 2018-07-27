@@ -22,6 +22,7 @@
 #include <DSK.hpp>
 #include <jni.h>
 #include <string>
+#include <android/log.h>
 
 using namespace std;
 
@@ -58,17 +59,12 @@ Java_mo_bioinf_bmark_MainActivity_stringFromJNI(JNIEnv *env, jobject instance) {
     char **argv;
 
 
+    DSK().run(1,argv);
     std::string hello = "Howdy from DSK";
-//        try
-//    {
-//        /** We execute dsk. */
-//        DSK().run (argc, argv);
-//    }
-//
-//    catch (OptionFailure& e)
-//    {
-//        hello = e.toString();
-//    }
+    //__android_log_print(ANDROID_LOG_INFO,"test",argv[1]);
+
+
+
 
 
 

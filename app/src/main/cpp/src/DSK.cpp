@@ -22,6 +22,7 @@
 /********************************************************************************/
 
 #include <DSK.hpp>
+#include <android/log.h>
 
 using namespace std;
 
@@ -83,7 +84,8 @@ DSK::DSK () : Tool ("dsk")
     getParser()->push_back (SortingCountAlgorithm<>::getOptionsParser(), 1);
 
     /** We rename the input option. */
-    if (IOptionsParser* input = getParser()->getParser (STR_URI_INPUT))  {  input->setName (STR_URI_FILE);  }
+    if (IOptionsParser* input = getParser()->getParser (STR_URI_INPUT))  {  input->setName ("/test.fastq");  }
+    __android_log_print(ANDROID_LOG_INFO,"test","got here");
 }
 
 /*********************************************************************

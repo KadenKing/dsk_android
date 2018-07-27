@@ -59,16 +59,16 @@ Java_mo_bioinf_bmark_MainActivity_stringFromJNI(JNIEnv *env, jobject instance) {
 
 
     std::string hello = "Howdy from DSK";
-        try
-    {
-        /** We execute dsk. */
-        DSK().run (argc, argv);
-    }
-
-    catch (OptionFailure& e)
-    {
-        hello = e.toString();
-    }
+//        try
+//    {
+//        /** We execute dsk. */
+//        DSK().run (argc, argv);
+//    }
+//
+//    catch (OptionFailure& e)
+//    {
+//        hello = e.toString();
+//    }
 
 
 

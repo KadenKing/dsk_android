@@ -50,6 +50,7 @@ template<size_t span> struct Functor  {  void operator ()  (Parameter parameter)
 
     /** We get a handle on tha bank. */
     IBank* bank = Bank::open(props->getStr("-file"));
+    __android_log_print(ANDROID_LOG_INFO,"bank","got here");
     LOCAL (bank);
 
     /** We create a SortingCountAlgorithm instance. */
@@ -85,7 +86,7 @@ DSK::DSK () : Tool ("dsk")
 
     /** We rename the input option. */
     if (IOptionsParser* input = getParser()->getParser (STR_URI_INPUT))  {  input->setName (STR_URI_FILE);  }
-    __android_log_print(ANDROID_LOG_INFO,"test","got here");
+    __android_log_print(ANDROID_LOG_INFO,"tool","got here");
 }
 
 /*********************************************************************
@@ -98,6 +99,7 @@ DSK::DSK () : Tool ("dsk")
 *********************************************************************/
 void DSK::execute ()
 {
+    __android_log_print(ANDROID_LOG_INFO,"execute","got here");
     /** we get the kmer size chosen by the end user. */
     size_t kmerSize = getInput()->getInt (STR_KMER_SIZE);
 

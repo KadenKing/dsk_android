@@ -60,7 +60,7 @@ Java_mo_bioinf_bmark_MainActivity_stringFromJNI(JNIEnv *env, jobject instance) {
 //    argv[0] = "-file";
 //    argv[1] = "/sdcard/Download/test.fastq";
 
-    //char* args[] = {"./dsk","-file", "/sdcard/Download/test.fastq"};
+    //char* args[] = {"./dsk", "-file", "/sdcard/Download/test.fastq"};
 
     try{
         DSK().run(1,argv);

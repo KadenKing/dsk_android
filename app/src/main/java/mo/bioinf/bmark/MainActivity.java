@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
         // Example of a call to a native method
         TextView tv = (TextView) findViewById(R.id.sample_text);
         checkPermission();
-        if (tryOpenFile(context) /*&& isExternalStorageReadable() && isExternalStorageWritable()*/) {
+        if (tryOpenFile(context) && isExternalStorageReadable() && isExternalStorageWritable()) {
             String x = stringFromJNI();
 
             tv.setText(x);
@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         else {
 
 
-            tv.setText(Environment.getDataDirectory().toString());
+            tv.setText("didn't work");
 
 
         }
@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     public boolean tryOpenFile(Context context) {
-        String path = context.getFilesDir() + "/" + "test.fastq";
+        String path ="sdcard/Download/test.fastq";
         File file = new File(path);
         boolean write = file.canWrite();
         boolean isFile = file.isFile();

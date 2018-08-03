@@ -50,16 +50,21 @@ template<size_t span> struct Functor  {  void operator ()  (Parameter parameter)
 
     /** We get a handle on tha bank. */
     IBank* bank = Bank::open(props->getStr("-file"));
-    __android_log_print(ANDROID_LOG_INFO,"bank","got here");
+
     LOCAL (bank);
 
     /** We create a SortingCountAlgorithm instance. */
     SortingCountAlgorithm<span> sortingCount (bank, props);
 
     sortingCount.getInput()->add (0, STR_VERBOSE, props->getStr(STR_VERBOSE));
-
+    __android_log_print(ANDROID_LOG_INFO,"bank","got here");
     /** We execute the algorithm. */
-    sortingCount.execute();
+    try{
+        sortingCount.execute();
+    }catch(gatb::core::system::Exception e)
+    {
+        __android_log_print(ANDROID_LOG_INFO,"bank error",e.getMessage());
+    }
 
     /** We collect statistics. */
     dsk.getInfo()->add (1, sortingCount.getConfig().getProperties());
@@ -68,6 +73,7 @@ template<size_t span> struct Functor  {  void operator ()  (Parameter parameter)
 
     /* save execution info into storage, same thing as Graph.cpp::executealgorithm would do */
     sortingCount.getStorage()->getGroup(sortingCount.getName()).setProperty("xml", string("\n") + sortingCount.getInfo()->getXML());
+
 
 } };
 

@@ -60,6 +60,11 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void checkPermission() {
+
+
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+
+
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.READ_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -128,8 +133,10 @@ public class MainActivity extends AppCompatActivity {
 
     /* Checks if external storage is available for read and write */
     public boolean isExternalStorageWritable() {
+
         String state = Environment.getExternalStorageState();
         if (Environment.MEDIA_MOUNTED.equals(state)) {
+
             return true;
         }
         return false;
@@ -144,4 +151,5 @@ public class MainActivity extends AppCompatActivity {
         }
         return false;
     }
+
 }

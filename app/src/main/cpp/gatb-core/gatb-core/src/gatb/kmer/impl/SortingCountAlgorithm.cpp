@@ -218,9 +218,9 @@ IOptionsParser* SortingCountAlgorithm<span>::getOptionsParser (bool mandatory)
     parser->push_back (new OptionOneParam (STR_MAX_MEMORY,        "max memory (in MBytes)",                         false, "500"));
     parser->push_back (new OptionOneParam (STR_MAX_DISK,          "max disk   (in MBytes)",                         false, "100"));
     parser->push_back (new OptionOneParam (STR_URI_SOLID_KMERS,   "output file for solid kmers (only when constructing a graph)", false, "sdcard/Download/"));
-    parser->push_back (new OptionOneParam (STR_URI_OUTPUT,        "output file",                                    false, "sdcard/Download/test/"));
-    parser->push_back (new OptionOneParam (STR_URI_OUTPUT_DIR,    "output directory",                               false, "sdcard/Download/test/"));
-    parser->push_back (new OptionOneParam (STR_URI_OUTPUT_TMP,    "output directory for temporary files",           false, "sdcard/Download/test/"));
+    parser->push_back (new OptionOneParam (STR_URI_OUTPUT,        "output file",                                    false, "sdcard/Download/test/_gatb/output"));
+    parser->push_back (new OptionOneParam (STR_URI_OUTPUT_DIR,    "output directory",                               false, "sdcard/Download/test/_gatb/"));
+    parser->push_back (new OptionOneParam (STR_URI_OUTPUT_TMP,    "output directory for temporary files",           false, "sdcard/Download/_gatb/"));
     parser->push_back (new OptionOneParam (STR_COMPRESS_LEVEL,    "h5 compression level (0:none, 9:best)",          false, "0"));
     parser->push_back (new OptionOneParam (STR_STORAGE_TYPE,      "storage type of kmer counts ('hdf5' or 'file')", false, "file"  ));
 

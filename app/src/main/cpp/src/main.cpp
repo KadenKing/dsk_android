@@ -54,24 +54,22 @@ using namespace std;
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_mo_bioinf_bmark_MainActivity_stringFromJNI(JNIEnv *env, jobject instance) {
+Java_mo_bioinf_bmark_MainActivity_stringFromJNI(JNIEnv *env, jobject instance, jstring path) {
 
     char **argv;
-//    argv[0] = "-file";
-//    argv[1] = "/sdcard/Download/test.fastq";
+//
+//    try{
+//        DSK().run(1,argv);
+//    }catch(OptionFailure& e)
+//    {
+//
+//        __android_log_print(ANDROID_LOG_INFO,"Exception", "caught");
+//    }
 
-    //char* args[] = {"./dsk", "-file", "/sdcard/Download/test.fastq"};
-
-    try{
-        DSK().run(1,argv);
-    }catch(OptionFailure& e)
-    {
-
-        __android_log_print(ANDROID_LOG_INFO,"Exception", "caught");
-    }
-
-    std::string hello = "Howdy from DSK";
-    __android_log_print(ANDROID_LOG_INFO,"test","main");
+    const char *str = (*env).GetStringUTFChars(path,0);
+    std::string javaPath = str;
+    //std::string hello = "Howdy from DSK";
+    __android_log_print(ANDROID_LOG_INFO,"test",str);
 
 
 
@@ -79,6 +77,6 @@ Java_mo_bioinf_bmark_MainActivity_stringFromJNI(JNIEnv *env, jobject instance) {
 
 
     //std::string hello = "Howdy from DSK";
-    return env->NewStringUTF("howdy from dsk");
+    return env->NewStringUTF(str);
 }
 

@@ -7,6 +7,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 import android.content.Context;
 
@@ -21,6 +22,8 @@ import java.io.InputStreamReader;
 
 public class MainActivity extends AppCompatActivity {
 
+
+
     // Used to load the 'native-lib' library on application startup.
     static {
         System.loadLibrary("dsk");
@@ -28,14 +31,19 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.println(Log.ASSERT, "hey", "hello");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Context context = this;
         // Example of a call to a native method
         TextView tv = (TextView) findViewById(R.id.sample_text);
+
         checkPermission();
         if (tryOpenFile(context) && isExternalStorageReadable() && isExternalStorageWritable()) {
-            String x = stringFromJNI();
+            Log.println(Log.ASSERT,"hey", "trying to access dsk");
+            String path = context.getFilesDir().getAbsolutePath().toString();
+            path += "/test.fastq";
+            String x = stringFromJNI(path);
 
             tv.setText(x);
         }
@@ -53,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
      * A native method that is implemented by the 'native-lib' native library,
      * which is packaged with this application.
      */
-    public native String stringFromJNI();
+    public native String stringFromJNI(String path);
 
 
 
@@ -62,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
     public void checkPermission() {
 
 
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+        //ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
 
 
         if (ContextCompat.checkSelfPermission(this,
@@ -103,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
 
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
-                    stringFromJNI();
+                    //stringFromJNI();
 
 
                 } else {
@@ -122,12 +130,15 @@ public class MainActivity extends AppCompatActivity {
 
 
     public boolean tryOpenFile(Context context) {
-        String path ="sdcard/Download/test.fastq";
+        String path = context.getFilesDir().getAbsolutePath().toString();
+        path += "/test.fastq";
+        Log.println(Log.ASSERT,"hey", path);
         File file = new File(path);
         boolean write = file.canWrite();
         boolean isFile = file.isFile();
         boolean exists = file.exists();
         return  file.exists();
+
     }
 
 

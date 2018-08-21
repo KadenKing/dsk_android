@@ -207,7 +207,7 @@ IOptionsParser* SortingCountAlgorithm<span>::getOptionsParser (bool mandatory)
     string abundanceMax = Stringify::format("%ld", std::numeric_limits<CountNumber>::max());
 
     //parser->push_back (new OptionOneParam (STR_URI_INPUT,         "reads file", mandatory ));
-    parser->push_back (new OptionOneParam (STR_URI_INPUT,         "reads file", false, "/data/user/0/mo.bioinf.bmark/files/test.fastq"));
+    parser->push_back (new OptionOneParam (STR_URI_INPUT,         "reads file", false, "/data/user/0/mo.bioinf.bmark/files/test_1.fastq"));
     parser->push_back (new OptionOneParam (STR_KMER_SIZE,         "size of a kmer",                                 false, "31"    ));
     parser->push_back (new OptionOneParam (STR_KMER_ABUNDANCE_MIN,"min abundance threshold for solid kmers",        false, "2"     ));
     parser->push_back (new OptionOneParam (STR_KMER_ABUNDANCE_MAX,"max abundance threshold for solid kmers",        false, abundanceMax));

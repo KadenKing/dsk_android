@@ -57,20 +57,20 @@ JNIEXPORT jstring JNICALL
 Java_mo_bioinf_bmark_MainActivity_stringFromJNI(JNIEnv *env, jobject instance, jstring path) {
 
     char **argv;
-//
-//    try{
-//        DSK().run(1,argv);
-//    }catch(OptionFailure& e)
-//    {
-//
-//        __android_log_print(ANDROID_LOG_INFO,"Exception", "caught");
-//    }
+
+    try{
+        DSK().run(1,argv);
+    }catch(OptionFailure& e)
+    {
+
+        __android_log_print(ANDROID_LOG_INFO,"Exception", "caught");
+    }
 
     const char *str = (*env).GetStringUTFChars(path,0);
     std::string javaPath = str;
     //std::string hello = "Howdy from DSK";
     __android_log_print(ANDROID_LOG_INFO,"test",str);
-
+    __android_log_print(ANDROID_LOG_INFO,"finish", "finished");
 
 
 

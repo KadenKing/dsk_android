@@ -23,6 +23,8 @@
 #include <jni.h>
 #include <string>
 #include <android/log.h>
+#include <chrono>
+
 
 using namespace std;
 
@@ -57,26 +59,33 @@ JNIEXPORT jstring JNICALL
 Java_mo_bioinf_bmark_MainActivity_stringFromJNI(JNIEnv *env, jobject instance, jstring path) {
 
     char **argv;
-
+    string strDuration;
     try{
+        chrono::high_resolution_clock::time_point t1 = chrono::high_resolution_clock::now();
         DSK().run(1,argv);
+        chrono::high_resolution_clock::time_point t2 = chrono::high_resolution_clock::now();
+        auto duration = chrono::duration_cast<chrono::seconds>( t2 - t1 ).count();
+        strDuration = to_string(duration);
+
     }catch(OptionFailure& e)
     {
 
         __android_log_print(ANDROID_LOG_INFO,"Exception", "caught");
     }
-
+    const char *charDuration = strDuration.c_str();
     const char *str = (*env).GetStringUTFChars(path,0);
     std::string javaPath = str;
     //std::string hello = "Howdy from DSK";
     __android_log_print(ANDROID_LOG_INFO,"test",str);
     __android_log_print(ANDROID_LOG_INFO,"finish", "finished");
 
-
+    string answer = "This fastq took ";
+    answer.append(strDuration);
+    answer.append(" seconds.");
 
 
 
     //std::string hello = "Howdy from DSK";
-    return env->NewStringUTF(str);
+    return env->NewStringUTF(answer.c_str());
 }
 

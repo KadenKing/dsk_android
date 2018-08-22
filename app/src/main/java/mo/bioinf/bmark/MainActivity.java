@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
 
     public boolean tryOpenFile(Context context) {
         String path = context.getFilesDir().getAbsolutePath().toString();
-        path += "/test.fastq";
+        path += "/fastq/test1.fastq";
         Log.println(Log.ASSERT,"hey", path);
         File file = new File(path);
         boolean write = file.canWrite();

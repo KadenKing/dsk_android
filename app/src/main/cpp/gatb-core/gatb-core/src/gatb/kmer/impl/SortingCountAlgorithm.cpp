@@ -207,7 +207,8 @@ IOptionsParser* SortingCountAlgorithm<span>::getOptionsParser (bool mandatory)
     string abundanceMax = Stringify::format("%ld", std::numeric_limits<CountNumber>::max());
 
     //parser->push_back (new OptionOneParam (STR_URI_INPUT,         "reads file", mandatory ));
-    parser->push_back (new OptionOneParam (STR_URI_INPUT,         "reads file", false, "/data/user/0/mo.bioinf.bmark/files/test_1.fastq"));
+
+    parser->push_back (new OptionOneParam (STR_URI_INPUT,         "reads file", false, "/data/user/0/mo.bioinf.bmark/files/fastq/test1.fastq"));
     parser->push_back (new OptionOneParam (STR_KMER_SIZE,         "size of a kmer",                                 false, "31"    ));
     parser->push_back (new OptionOneParam (STR_KMER_ABUNDANCE_MIN,"min abundance threshold for solid kmers",        false, "2"     ));
     parser->push_back (new OptionOneParam (STR_KMER_ABUNDANCE_MAX,"max abundance threshold for solid kmers",        false, abundanceMax));
@@ -215,8 +216,8 @@ IOptionsParser* SortingCountAlgorithm<span>::getOptionsParser (bool mandatory)
     parser->push_back (new OptionOneParam (STR_HISTOGRAM_MAX,     "max number of values in kmers histogram",        false, "10000"));
     parser->push_back (new OptionOneParam (STR_SOLIDITY_KIND,     "way to compute counts of several files (sum, min, max, one, all, custom)",false, "sum"));
 	parser->push_back (new OptionOneParam (STR_SOLIDITY_CUSTOM,   "when solidity-kind is cutom, specifies list of files where kmer must be present",false, ""));
-    parser->push_back (new OptionOneParam (STR_MAX_MEMORY,        "max memory (in MBytes)",                         false, "500"));
-    parser->push_back (new OptionOneParam (STR_MAX_DISK,          "max disk   (in MBytes)",                         false, "100"));
+    parser->push_back (new OptionOneParam (STR_MAX_MEMORY,        "max memory (in MBytes)",                         false, "2000"));
+    parser->push_back (new OptionOneParam (STR_MAX_DISK,          "max disk   (in MBytes)",                         false, "20000"));
     parser->push_back (new OptionOneParam (STR_URI_SOLID_KMERS,   "output file for solid kmers (only when constructing a graph)", false, "/data/user/0/mo.bioinf.bmark/files"));
     parser->push_back (new OptionOneParam (STR_URI_OUTPUT,        "output file",                                    false));
     parser->push_back (new OptionOneParam (STR_URI_OUTPUT_DIR,    "output directory",                               false, "/data/user/0/mo.bioinf.bmark/files"));

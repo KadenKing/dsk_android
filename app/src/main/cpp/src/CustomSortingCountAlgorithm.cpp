@@ -2,7 +2,10 @@
 // Created by kaden on 8/22/18.
 //
 
-#include "CustomSortingCountAlgorithm.h"
+#include "CustomSortingCountAlgorithm.hpp"
+
+
+
 
 template<size_t span>
 IOptionsParser* CustomSortingCountAlgorithm<span>::getOptionsParser (bool mandatory)

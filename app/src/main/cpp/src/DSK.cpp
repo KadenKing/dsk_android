@@ -22,6 +22,7 @@
 /********************************************************************************/
 
 #include <DSK.hpp>
+#include "CustomSortingCountAlgorithm.hpp"
 #include <android/log.h>
 
 using namespace std;
@@ -89,7 +90,6 @@ DSK::DSK () : Tool ("dsk")
 {
     /** We add options specific to DSK (most important at the end). */
     getParser()->push_back (SortingCountAlgorithm<>::getOptionsParser(), 1);
-
     /** We rename the input option. */
     if (IOptionsParser* input = getParser()->getParser (STR_URI_INPUT))  {  input->setName (STR_URI_FILE);  }
     __android_log_print(ANDROID_LOG_INFO,"tool","got here");

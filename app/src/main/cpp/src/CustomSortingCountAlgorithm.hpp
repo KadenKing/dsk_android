@@ -43,6 +43,8 @@ namespace gatb      {
 template<size_t span=KMER_DEFAULT_SPAN>
 class CustomSortingCountAlgorithm : public gatb::core::kmer::impl::SortingCountAlgorithm<>
 {
+public:
+    using gatb::core::kmer::impl::SortingCountAlgorithm<>::SortingCountAlgorithm;
     static tools::misc::IOptionsParser* getOptionsParser (bool mandatory=true);
 
 };

@@ -3,13 +3,17 @@ package mo.bioinf.bmark;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.content.Context;
+import android.widget.ViewFlipper;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -36,24 +40,50 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Context context = this;
         // Example of a call to a native method
-        TextView tv = (TextView) findViewById(R.id.sample_text);
+        final TextView tv = (TextView) findViewById(R.id.sample_text);
+        final Button run = (Button) findViewById(R.id.run_button);
+        run.setEnabled(false);
 
+        /*gets this phone's directory within the application*/
+        String path = context.getFilesDir().getAbsolutePath().toString();
+        path += "/fastq/test1.fastq";
+
+        /*makes sure that if we press the run button the app won't crash due to a file permission error*/
         checkPermission();
-        if (tryOpenFile(context) && isExternalStorageReadable() && isExternalStorageWritable()) {
-            Log.println(Log.ASSERT,"hey", "trying to access dsk");
-            String path = context.getFilesDir().getAbsolutePath().toString();
-            path += "/test.fastq";
-            String x = stringFromJNI(path);
-
-            tv.setText(x);
+        if (tryOpenFile(context,path) && isExternalStorageReadable() && isExternalStorageWritable()) {
+            run.setEnabled(true);
         }
-        else {
 
 
-            tv.setText("didn't work");
+        /*making a view flipper so that we can have a loading animation*/
+        final ViewFlipper flipper = (ViewFlipper) findViewById(R.id.flipper);
+
+        final String runPath = path;
+
+        final Runnable DSK = new Runnable(){
+            @Override
+            public void run(){
+                String x = stringFromJNI(runPath);
+                flipper.showNext();
+                tv.setText(x);
+            }
+        };
+
+        final Handler dskHandler = new Handler();
 
 
-        }
+
+        run.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+                run.setEnabled(false);
+                flipper.showNext();
+                dskHandler.postDelayed(DSK,500);
+
+
+            }
+        });
+
+
 
     }
 
@@ -129,9 +159,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    public boolean tryOpenFile(Context context) {
-        String path = context.getFilesDir().getAbsolutePath().toString();
-        path += "/fastq/test1.fastq";
+    public boolean tryOpenFile(Context context, String path) {
         Log.println(Log.ASSERT,"hey", path);
         File file = new File(path);
         boolean write = file.canWrite();

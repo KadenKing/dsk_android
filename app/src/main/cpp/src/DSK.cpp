@@ -22,7 +22,6 @@
 /********************************************************************************/
 
 #include <DSK.hpp>
-#include "CustomSortingCountAlgorithm.hpp"
 #include <android/log.h>
 
 using namespace std;

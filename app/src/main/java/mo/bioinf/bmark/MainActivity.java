@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
@@ -34,21 +35,10 @@ public class MainActivity extends AppCompatActivity {
         System.loadLibrary("dsk");
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        Log.println(Log.ASSERT, "hey", "hello");
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Context context = this;
-        // Example of a call to a native method
-        final TextView tv = (TextView) findViewById(R.id.sample_text);
-        final Button run = (Button) findViewById(R.id.run_button);
-        final Spinner dropdown = (Spinner) findViewById(R.id.fastq_files);
-        run.setEnabled(false);
-
+    void populateDropdown(Context context, Spinner dropdown, String base_path){
         /*gets this phone's directory within the application*/
-        String path = context.getFilesDir().getAbsolutePath().toString();
-        File fastq_folder = new File(path + "/fastq");
+
+        File fastq_folder = new File(base_path + "/fastq");
         File[] fastq_files = fastq_folder.listFiles();
         List<String> fastq_file_names = new ArrayList<String>();
         for(File fastq_file : fastq_files)
@@ -61,31 +51,66 @@ public class MainActivity extends AppCompatActivity {
                 this, android.R.layout.simple_spinner_item, fastq_file_names);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         dropdown.setAdapter(adapter);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        Log.println(Log.ASSERT, "hey", "hello");
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        final Context context = this;
+
+        final TextView tv = (TextView) findViewById(R.id.sample_text);
+        final Button run = (Button) findViewById(R.id.run_button);
+        final Spinner dropdown = (Spinner) findViewById(R.id.fastq_files);
+        run.setEnabled(false);
+
+        final String base_path = context.getFilesDir().getAbsolutePath().toString(); // this phone's working directory
+
+        populateDropdown(context, dropdown, base_path); // fills the dropdown with the files in the fastq folder
+
+
+
+        /** path[] is an array because a work-around is needed to edit a variable from within the anonymous method
+          */
+        final String path[] = {base_path};
+
+        /*current file path is updated and shown on the text view */
+        dropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+        {
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
+            {
+                String selectedItem = parent.getItemAtPosition(position).toString();
+                path[0] = base_path + "/fastq/" + selectedItem;
+                tv.setText(path[0]);
+
+
+                /*makes sure that if we press the run button the app won't crash due to a file permission error*/
+                checkPermission();
+                if (tryOpenFile(context,path[0]) && isExternalStorageReadable() && isExternalStorageWritable()) {
+                    run.setEnabled(true);
+                }
+
+            } // to close the onItemSelected
+            public void onNothingSelected(AdapterView<?> parent)
+            {
+
+            }
+        });
 
 
 
 
-
-        path += "/fastq/test1.fastq";
-
-
-
-        /*makes sure that if we press the run button the app won't crash due to a file permission error*/
-        checkPermission();
-        if (tryOpenFile(context,path) && isExternalStorageReadable() && isExternalStorageWritable()) {
-            run.setEnabled(true);
-        }
 
 
         /*making a view flipper so that we can have a loading animation*/
         final ViewFlipper flipper = (ViewFlipper) findViewById(R.id.flipper);
 
-        final String runPath = path;
 
         final Runnable DSK = new Runnable(){
             @Override
             public void run(){
-                String x = stringFromJNI(runPath);
+                String x = stringFromJNI(path[0]);
                 flipper.showNext();
                 tv.setText(x);
             }

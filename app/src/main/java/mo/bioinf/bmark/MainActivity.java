@@ -10,7 +10,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.content.Context;
 import android.widget.ViewFlipper;
@@ -19,9 +21,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-
-
-
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -42,11 +43,32 @@ public class MainActivity extends AppCompatActivity {
         // Example of a call to a native method
         final TextView tv = (TextView) findViewById(R.id.sample_text);
         final Button run = (Button) findViewById(R.id.run_button);
+        final Spinner dropdown = (Spinner) findViewById(R.id.fastq_files);
         run.setEnabled(false);
 
         /*gets this phone's directory within the application*/
         String path = context.getFilesDir().getAbsolutePath().toString();
+        File fastq_folder = new File(path + "/fastq");
+        File[] fastq_files = fastq_folder.listFiles();
+        List<String> fastq_file_names = new ArrayList<String>();
+        for(File fastq_file : fastq_files)
+        {
+            fastq_file_names.add(fastq_file.getName().toString());
+        }
+
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                this, android.R.layout.simple_spinner_item, fastq_file_names);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        dropdown.setAdapter(adapter);
+
+
+
+
+
         path += "/fastq/test1.fastq";
+
+
 
         /*makes sure that if we press the run button the app won't crash due to a file permission error*/
         checkPermission();
@@ -75,7 +97,6 @@ public class MainActivity extends AppCompatActivity {
 
         run.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-                run.setEnabled(false);
                 flipper.showNext();
                 dskHandler.postDelayed(DSK,500);
 

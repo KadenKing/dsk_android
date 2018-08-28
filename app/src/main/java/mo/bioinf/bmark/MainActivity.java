@@ -1,6 +1,8 @@
 package mo.bioinf.bmark;
 
 import android.Manifest;
+import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Environment;
 import android.os.Handler;
@@ -52,6 +54,20 @@ public class MainActivity extends AppCompatActivity {
                 this, android.R.layout.simple_spinner_item, fastq_file_names);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         dropdown.setAdapter(adapter);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        if(data != null){
+            int kmer = data.getIntExtra("kmer",0);
+            int mem = data.getIntExtra("memory",0);
+            int disk = data.getIntExtra("disk",0);
+
+            final TextView tv = (TextView) findViewById(R.id.sample_text);
+            tv.setText(kmer + " " + mem + " " + disk);
+        }
+
+
     }
 
     @Override
@@ -122,7 +138,8 @@ public class MainActivity extends AppCompatActivity {
 
         settings_button.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-                flipper.setDisplayedChild(2);
+                Intent myIntent = new Intent(getBaseContext(), SettingsActivity.class);
+                MainActivity.this.startActivityForResult(myIntent,1);
 
 
 

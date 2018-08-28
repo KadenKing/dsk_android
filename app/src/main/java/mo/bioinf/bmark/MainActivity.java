@@ -142,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
         final Runnable DSK = new Runnable(){
             @Override
             public void run(){
-                String x = stringFromJNI(fullPath);
+                String x = stringFromJNI(fullPath,kmer,memory,disk);
                 flipper.showNext();
                 tv.setText(x);
             }
@@ -177,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
      * A native method that is implemented by the 'native-lib' native library,
      * which is packaged with this application.
      */
-    public native String stringFromJNI(String path);
+    public native String stringFromJNI(String path, int kmer, int memory, int disk);
 
 
 

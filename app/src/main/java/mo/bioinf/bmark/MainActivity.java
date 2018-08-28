@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.content.Context;
@@ -63,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
         final TextView tv = (TextView) findViewById(R.id.sample_text);
         final Button run = (Button) findViewById(R.id.run_button);
         final Spinner dropdown = (Spinner) findViewById(R.id.fastq_files);
+        final ImageButton settings_button = (ImageButton) findViewById(R.id.settings_button);
         run.setEnabled(false);
 
         final String base_path = context.getFilesDir().getAbsolutePath().toString(); // this phone's working directory
@@ -118,7 +120,14 @@ public class MainActivity extends AppCompatActivity {
 
         final Handler dskHandler = new Handler();
 
+        settings_button.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+                flipper.setDisplayedChild(2);
 
+
+
+            }
+        });
 
         run.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){

@@ -54,6 +54,8 @@ using namespace std;
 //}
 
 
+
+
 extern "C"
 JNIEXPORT jstring JNICALL
 Java_mo_bioinf_bmark_MainActivity_stringFromJNI(JNIEnv *env, jobject instance, jstring path) {

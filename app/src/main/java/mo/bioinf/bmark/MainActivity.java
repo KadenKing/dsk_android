@@ -31,6 +31,11 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    private int kmer = 32;
+    private int memory = 2000;
+    private int disk = 20000;
+    private String fullPath = "";
+
 
 
     // Used to load the 'native-lib' library on application startup.
@@ -38,10 +43,18 @@ public class MainActivity extends AppCompatActivity {
         System.loadLibrary("dsk");
     }
 
+    void updateTV(TextView tv, int kmer, int memory, int disk, String path){
+        String text = "kmer: " + kmer + "\n" +
+                        "memory: " + memory + "\n" +
+                        " disk: " + disk + "\n" +
+                        "path: " + path + "\n";
+        tv.setText(text);
+    }
+
     void populateDropdown(Context context, Spinner dropdown, String base_path){
         /*gets this phone's directory within the application*/
 
-        File fastq_folder = new File(base_path + "/fastq");
+        File fastq_folder = new File(base_path);
         File[] fastq_files = fastq_folder.listFiles();
         List<String> fastq_file_names = new ArrayList<String>();
         for(File fastq_file : fastq_files)
@@ -59,12 +72,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         if(data != null){
-            int kmer = data.getIntExtra("kmer",0);
-            int mem = data.getIntExtra("memory",0);
-            int disk = data.getIntExtra("disk",0);
+            this.kmer = data.getIntExtra("kmer",0);
+            this.memory = data.getIntExtra("memory",0);
+            this.disk = data.getIntExtra("disk",0);
 
             final TextView tv = (TextView) findViewById(R.id.sample_text);
-            tv.setText(kmer + " " + mem + " " + disk);
+            updateTV(tv,kmer,memory,disk,fullPath);
         }
 
 
@@ -83,7 +96,8 @@ public class MainActivity extends AppCompatActivity {
         final ImageButton settings_button = (ImageButton) findViewById(R.id.settings_button);
         run.setEnabled(false);
 
-        final String base_path = context.getFilesDir().getAbsolutePath().toString(); // this phone's working directory
+        final String base_path = context.getFilesDir().getAbsolutePath().toString() + "/fastq/"; // this phone's working directory
+        this.fullPath = base_path;
 
         populateDropdown(context, dropdown, base_path); // fills the dropdown with the files in the fastq folder
 
@@ -99,13 +113,13 @@ public class MainActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
             {
                 String selectedItem = parent.getItemAtPosition(position).toString();
-                path[0] = base_path + "/fastq/" + selectedItem;
-                tv.setText(path[0]);
+                fullPath = base_path  + selectedItem;
+                updateTV(tv,kmer,memory,disk,fullPath);
 
 
                 /*makes sure that if we press the run button the app won't crash due to a file permission error*/
                 checkPermission();
-                if (tryOpenFile(context,path[0]) && isExternalStorageReadable() && isExternalStorageWritable()) {
+                if (tryOpenFile(context,fullPath) && isExternalStorageReadable() && isExternalStorageWritable()) {
                     run.setEnabled(true);
                 }
 
@@ -128,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
         final Runnable DSK = new Runnable(){
             @Override
             public void run(){
-                String x = stringFromJNI(path[0]);
+                String x = stringFromJNI(fullPath);
                 flipper.showNext();
                 tv.setText(x);
             }

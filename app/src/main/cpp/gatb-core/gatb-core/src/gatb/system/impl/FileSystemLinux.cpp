@@ -54,7 +54,7 @@ public:
     FileLinux (const char* path, const char* mode) : CommonFile(path,mode)  { }
 
     /** \copydoc IFile::tell */
-    u_int64_t tell ()  { return (isOpen() ? ftello64 (_handle) : 0); }
+    u_int64_t tell ()  { return (isOpen() ? ftello (_handle) : 0); }
 
 	/** \copydoc IFile::seeko */
     int seeko (u_int64_t offset, int whence)  {  return (isOpen() ?  fseek /* cygwin doesnt like fseeko and fseek/fseeko seems similar */(_handle, offset, whence) : -1);  }

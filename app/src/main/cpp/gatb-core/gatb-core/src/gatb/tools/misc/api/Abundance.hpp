@@ -31,7 +31,7 @@
 /********************************************************************************/
 
 #include <sys/types.h>
-#include <hdf5/hdf5.h>
+//#include <hdf5/hdf5.h>
 
 /********************************************************************************/
 namespace gatb      {
@@ -105,24 +105,24 @@ template<typename Type, typename Number=u_int16_t> struct Abundance
      * for dumping Count instances in a HDF5 file (like SortingCount algorithm does).
      * \param[in] isCompound : tells whether the structure is compound (SHOULD BE OBSOLETE IN THE FUTURE)
      * \return the HDF5 identifier for the type. */
-    static hid_t hdf5 (bool& isCompound)
-    {
-        hid_t abundanceType = H5T_NATIVE_UINT16;
+    // static hid_t hdf5 (bool& isCompound)
+    // {
+    //     hid_t abundanceType = H5T_NATIVE_UINT16;
 
-             if (sizeof(Number)==1) { abundanceType = H5T_NATIVE_UINT8;  }
-        else if (sizeof(Number)==2) { abundanceType = H5T_NATIVE_UINT16; }
-        else if (sizeof(Number)==4) { abundanceType = H5T_NATIVE_UINT32; }
-        else if (sizeof(Number)==8) { abundanceType = H5T_NATIVE_UINT64; }
-        else { throw "Bad type size for Abundance HDF5 serialization";   }
+    //          if (sizeof(Number)==1) { abundanceType = H5T_NATIVE_UINT8;  }
+    //     else if (sizeof(Number)==2) { abundanceType = H5T_NATIVE_UINT16; }
+    //     else if (sizeof(Number)==4) { abundanceType = H5T_NATIVE_UINT32; }
+    //     else if (sizeof(Number)==8) { abundanceType = H5T_NATIVE_UINT64; }
+    //     else { throw "Bad type size for Abundance HDF5 serialization";   }
 
-        hid_t result = H5Tcreate (H5T_COMPOUND, sizeof(Abundance));
-        H5Tinsert (result, "value",      HOFFSET(Abundance, value),     Type::hdf5(isCompound));
-        H5Tinsert (result, "abundance",  HOFFSET(Abundance, abundance), abundanceType);
+    //     hid_t result = H5Tcreate (H5T_COMPOUND, sizeof(Abundance));
+    //     H5Tinsert (result, "value",      HOFFSET(Abundance, value),     Type::hdf5(isCompound));
+    //     H5Tinsert (result, "abundance",  HOFFSET(Abundance, abundance), abundanceType);
 
-        isCompound = true;
+    //     isCompound = true;
 
-        return result;
-    }
+    //     return result;
+    // }
 
     Type    value;
     Number  abundance;

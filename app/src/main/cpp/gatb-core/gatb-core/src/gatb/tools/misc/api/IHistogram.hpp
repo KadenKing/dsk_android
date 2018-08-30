@@ -28,7 +28,7 @@
 
 #include <gatb/system/api/ISmartPointer.hpp>
 #include <gatb/tools/storage/impl/Storage.hpp>
-#include <hdf5/hdf5.h>
+//#include <hdf5/hdf5.h>
 
 /********************************************************************************/
 namespace gatb      {
@@ -67,14 +67,14 @@ public:
         u_int16_t index;
         u_int64_t abundance;
 
-        inline static hid_t hdf5 (bool& compound)
-        {
-            hid_t result = H5Tcreate (H5T_COMPOUND, sizeof(Entry));
-            H5Tinsert (result, "index",      HOFFSET(Entry, index),     H5T_NATIVE_UINT16);
-            H5Tinsert (result, "abundance",  HOFFSET(Entry, abundance), H5T_NATIVE_UINT64);
-            compound = true;
-            return result;
-        }
+        // inline static hid_t hdf5 (bool& compound)
+        // {
+        //     hid_t result = H5Tcreate (H5T_COMPOUND, sizeof(Entry));
+        //     H5Tinsert (result, "index",      HOFFSET(Entry, index),     H5T_NATIVE_UINT16);
+        //     H5Tinsert (result, "abundance",  HOFFSET(Entry, abundance), H5T_NATIVE_UINT64);
+        //     compound = true;
+        //     return result;
+        // }
         
         /** Comparison operator
          * \param[in] other : object to be compared to

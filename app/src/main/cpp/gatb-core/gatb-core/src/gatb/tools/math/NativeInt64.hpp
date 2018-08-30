@@ -31,7 +31,7 @@
 #include <iostream>
 #include <gatb/system/api/types.hpp>
 #include <gatb/tools/misc/api/Abundance.hpp>
-#include <hdf5/hdf5.h>
+//#include <hdf5/hdf5.h>
 
 extern const unsigned char revcomp_4NT[];
 extern const unsigned char comp_NT    [];
@@ -221,10 +221,10 @@ public:
     }
 
     /********************************************************************************/
-    inline static hid_t hdf5 (bool& isCompound)
-    {
-        return H5Tcopy (H5T_NATIVE_UINT64);
-    }
+    // inline static hid_t hdf5 (bool& isCompound)
+    // {
+    //     //return H5Tcopy (H5T_NATIVE_UINT64);
+    // }
 
 private:
     u_int64_t value;

@@ -215,20 +215,20 @@ IOptionsParser* SortingCountAlgorithm<span>::getOptionsParser (bool mandatory)
 	parser->push_back (new OptionOneParam (STR_SOLIDITY_CUSTOM,   "when solidity-kind is cutom, specifies list of files where kmer must be present",false, ""));
     parser->push_back (new OptionOneParam (STR_MAX_MEMORY,        "max memory (in MBytes)",                         false, "5000"));
     parser->push_back (new OptionOneParam (STR_MAX_DISK,          "max disk   (in MBytes)",                         false, "0"));
-    parser->push_back (new OptionOneParam (STR_URI_SOLID_KMERS,   "output file for solid kmers (only when constructing a graph)", false));
-    parser->push_back (new OptionOneParam (STR_URI_OUTPUT,        "output file",                                    false));
-    parser->push_back (new OptionOneParam (STR_URI_OUTPUT_DIR,    "output directory",                               false, "."));
-    parser->push_back (new OptionOneParam (STR_URI_OUTPUT_TMP,    "output directory for temporary files",           false, "."));
+    parser->push_back (new OptionOneParam (STR_URI_SOLID_KMERS,   "output file for solid kmers (only when constructing a graph)", false, "/data/user/0/mo.bioinf.bmark/files"));
+    parser->push_back (new OptionOneParam (STR_URI_OUTPUT,        "output file",                                    false, "/data/user/0/mo.bioinf.bmark/files"));
+    parser->push_back (new OptionOneParam (STR_URI_OUTPUT_DIR,    "output directory",                               false, "/data/user/0/mo.bioinf.bmark/files"));
+    parser->push_back (new OptionOneParam (STR_URI_OUTPUT_TMP,    "output directory for temporary files",           false, "/data/user/0/mo.bioinf.bmark/files"));
     parser->push_back (new OptionOneParam (STR_COMPRESS_LEVEL,    "h5 compression level (0:none, 9:best)",          false, "0"));
-    parser->push_back (new OptionOneParam (STR_STORAGE_TYPE,      "storage type of kmer counts ('hdf5' or 'file')", false, "hdf5"  ));
+    parser->push_back (new OptionOneParam (STR_STORAGE_TYPE,      "storage type of kmer counts ('hdf5' or 'file')", false, "file"  ));
 	parser->push_back (new OptionOneParam (STR_HISTO2D,"compute the 2D histogram (with first file = genome, remaining files = reads)",false,"0"));
-	parser->push_back (new OptionOneParam (STR_HISTO,"output the kmer abundance histogram",false,"0"));
+	parser->push_back (new OptionOneParam (STR_HISTO,"output the kmer abundance histogram",false,"1"));
 
     IOptionsParser* devParser = new OptionsParser ("kmer count, advanced performance tweaks");
 
     devParser->push_back (new OptionOneParam (STR_MINIMIZER_TYPE,    "minimizer type (0=lexi, 1=freq)",                false, "0"));
     devParser->push_back (new OptionOneParam (STR_MINIMIZER_SIZE,    "size of a minimizer",                            false, "10"));
-    devParser->push_back (new OptionOneParam (STR_REPARTITION_TYPE,  "minimizer repartition (0=unordered, 1=ordered)", false, "0"));
+    devParser->push_back (new OptionOneParam (STR_REPARTITION_TYPE,  "minimizer repartition (0=unordered, 1=ordered)", false, "1"));
     parser->push_back (devParser);
 
     return parser;

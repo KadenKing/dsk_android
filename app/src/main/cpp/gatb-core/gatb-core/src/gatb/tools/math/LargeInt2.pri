@@ -134,12 +134,12 @@ public:
     }
 
     /********************************************************************************/
-    static hid_t hdf5 (bool& isCompound)
-    {
-        hid_t result = H5Tcopy (H5T_NATIVE_INT);
-        H5Tset_precision (result, 128);
-        return result;
-    }
+    // static hid_t hdf5 (bool& isCompound)
+    // {
+    //     hid_t result = H5Tcopy (H5T_NATIVE_INT);
+    //     H5Tset_precision (result, 128);
+    //     return result;
+    // }
     
     /********************************************************************************/
     template<typename Map>

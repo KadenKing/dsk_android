@@ -57,28 +57,39 @@ using namespace std;
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_mo_bioinf_bmark_MainActivity_stringFromJNI(JNIEnv *env, jobject instance, jstring path, jint kmer, jint memory, jint disk) {
+Java_mo_bioinf_bmark_MainActivity_stringFromJNI(JNIEnv *env, jobject instance, jstring path, jstring base_path, jint kmer, jint memory, jint disk, jint repartition_type, jint minimizer_type) {
     const char *str = (*env).GetStringUTFChars(path,0);
     std::string javaPath = str;
-    string strK, strM, strD;
+    const char *bstr = (*env).GetStringUTFChars(base_path,0);
+    std::string javaBasePath = bstr;
+    string strK, strM, strD, strRepartition, strMinimizer;
     strK = to_string(kmer);
     strM = to_string(memory);
     strD = to_string(disk);
+    strRepartition = to_string(repartition_type);
+    strMinimizer = to_string(minimizer_type);
+
 
     __android_log_print(ANDROID_LOG_INFO,"file",javaPath.c_str());
+    __android_log_print(ANDROID_LOG_INFO,"base_path",&javaBasePath[0u]);
     __android_log_print(ANDROID_LOG_INFO,"kmer",&strK[0u]);
     __android_log_print(ANDROID_LOG_INFO,"mem",&strM[0u]);
     __android_log_print(ANDROID_LOG_INFO,"disk",&strD[0u]);
+    __android_log_print(ANDROID_LOG_INFO,"repartition",&strRepartition[0u]);
+    __android_log_print(ANDROID_LOG_INFO,"minimizer",&strMinimizer[0u]);
 
-    char *argv[] = {"./dsk", "-file", &javaPath[0u], "-kmer-size", &strK[0u], "-max-memory", &strM[0u], "-max-disk", &strD[0u]};
+    char *argv[] = {"./dsk", "-file", &javaPath[0u], "-kmer-size",  &strK[0u],"-out", &javaBasePath[0u],
+                    "-out-tmp", &javaBasePath[0u], "-out-dir", &javaBasePath[0u], "-max-memory", &strM[0u],
+                    "-max-disk", &strD[0u], "-minimizer-type", &strRepartition[0u], "-minimizer-type", &strMinimizer[0u]};
     //char *argv[] = {"./dsk", "-file", &javaPath[0u]};
+
 
     //makeArgv(javaPath,kmer,memory,disk,argv);
 
     string strDuration;
     try{
         chrono::high_resolution_clock::time_point t1 = chrono::high_resolution_clock::now();
-        DSK().run(3,argv);
+        DSK().run(19,argv);
         chrono::high_resolution_clock::time_point t2 = chrono::high_resolution_clock::now();
         auto duration = chrono::duration_cast<chrono::seconds>( t2 - t1 ).count();
         strDuration = to_string(duration);

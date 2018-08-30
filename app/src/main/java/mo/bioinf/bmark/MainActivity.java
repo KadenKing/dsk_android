@@ -34,7 +34,10 @@ public class MainActivity extends AppCompatActivity {
     private int kmer = 31;
     private int memory = 2000;
     private int disk = 20000;
+    private String devicePath = "";
     private String fullPath = "";
+    private int repartition_type = 0;
+    private int minimizer_type = 0;
 
 
 
@@ -75,6 +78,8 @@ public class MainActivity extends AppCompatActivity {
             this.kmer = data.getIntExtra("kmer",0);
             this.memory = data.getIntExtra("memory",0);
             this.disk = data.getIntExtra("disk",0);
+            this.minimizer_type = data.getIntExtra("minimizer_type", -2);
+            this.repartition_type = data.getIntExtra("repartition_type", -2);
 
             final TextView tv = (TextView) findViewById(R.id.sample_text);
             updateTV(tv,kmer,memory,disk,fullPath);
@@ -97,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
         run.setEnabled(false);
 
         final String base_path = context.getFilesDir().getAbsolutePath().toString() + "/fastq/"; // this phone's working directory
+        devicePath = context.getFilesDir().getAbsolutePath().toString();
         this.fullPath = base_path;
 
         populateDropdown(context, dropdown, base_path); // fills the dropdown with the files in the fastq folder
@@ -142,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
         final Runnable DSK = new Runnable(){
             @Override
             public void run(){
-                String x = stringFromJNI(fullPath,kmer,memory,disk);
+                String x = stringFromJNI(fullPath,devicePath,kmer,memory,disk,repartition_type,minimizer_type);
                 flipper.showNext();
                 tv.setText(x);
             }
@@ -177,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
      * A native method that is implemented by the 'native-lib' native library,
      * which is packaged with this application.
      */
-    public native String stringFromJNI(String path, int kmer, int memory, int disk);
+    public native String stringFromJNI(String path, String base_path, int kmer, int memory, int disk, int repartition_type, int minimizer_type);
 
 
 

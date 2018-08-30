@@ -211,10 +211,10 @@ public:
     }
 
     /********************************************************************************/
-    // static hid_t hdf5 (bool& isCompound)
-    // {
-    //     // return H5Tcopy (H5T_NATIVE_UINT64);
-    // }
+    static hid_t hdf5 (bool& isCompound)
+    {
+        return H5Tcopy (H5T_NATIVE_UINT64);
+    }
 
     /********************************************************************************/
     template<typename Map>

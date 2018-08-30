@@ -217,7 +217,7 @@ inline void graph3<span>::update_connected(kmerIndiceT<span> &ki)
 {
     if (ki.position == SEQ_LEFT)
         connected_left[ki.indice] = true;
-    else
+    if (ki.position == SEQ_RIGHT)
         connected_right[ki.indice] = true;
 }
 
@@ -228,7 +228,7 @@ template<size_t span>
 void graph3<span>::debruijn(){
 	sort(left.begin(),left.end(),comparator<span>());
 	sort(right.begin(),right.end(),comparator<span>());
-	uint iL(0),iR(0),sizeLeft(left.size()),sizeRight(right.size());
+	uint64_t iL(0),iR(0),sizeLeft(left.size()),sizeRight(right.size());
     typename graph3<span>::kmerType minusone;
     minusone.setVal(-1);
 	left.push_back({0,minusone, SEQ_LEFT}); // dummy kmer so that we dont need to check bounds.. clever..
@@ -249,25 +249,43 @@ void graph3<span>::debruijn(){
 		kL=left[iL];
 		kR=right[iR];
 
-        if (debug_index > 0) if (kL.indice == debug_index || kR.indice == debug_index ) std::cout << " kl / kR " << kL.indice << " " << kR.indice << " " << kL.kmmer << " " << kR.kmmer << " unitigs " << unitigs[kL.indice] << " " << unitigs[kR.indice] << std::endl;
+        //~ std::cout << " kl / kR " << kL.indice << " " << kR.indice << " " << kL.kmmer << " " << kR.kmmer << " unitigs " << unitigs[kL.indice] << " " << unitigs[kR.indice] << std::endl;
 
 		if(kL.kmmer==kR.kmmer){
-            if (debug_index > 0) if (kL.indice == debug_index || kR.indice == debug_index ) std::cout << " identical, kl / kR " << kL.indice << " " << kR.indice << " unitigs " << unitigs[kL.indice] << " " << unitigs[kR.indice] << " positions "  << kL.position << " " << kR.position << std::endl;
-            update_connected(kL);
-            update_connected(kR);
+            //~ if (debug_index > 0) if (kL.indice == debug_index || kR.indice == debug_index ) std::cout << " identical, kl / kR " << kL.indice << " " << kR.indice << " unitigs " << unitigs[kL.indice] << " " << unitigs[kR.indice] << " positions "  << kL.position << " " << kR.position << std::endl;
+            //~ if(isNumber (unitigs[kL.indice][0])){
+			//~ }
+            if(not kL.indice==kR.indice){
+				update_connected(kL);
+				update_connected(kR);
+			}
 
             // found the same (k-1)-mer in the left and right array, it means that two sequences end with those and could be potentially compacted
 			bool go(true);
 			++iL;++iR;
 			if(left[iL].kmmer==kL.kmmer){
 				go=false;
-				update_connected(left[iL]);
-				while(left[++iL].kmmer<=kR.kmmer ){if(iL==sizeLeft){return;}}
+				if(not left[iL].indice==right[iR].indice){
+					update_connected(left[iL]);
+				}
+				//~ while(left[++iL].kmmer<=kR.kmmer ){}
+				while(true){
+					++iL;
+					if(iL>=left.size()){break;}
+					if(not (left[iL].kmmer<=kR.kmmer)){break;}
+				}
 			}
 			if(right[iR].kmmer==kL.kmmer){
 				go=false;
-				update_connected(right[iR]);
-				while(right[++iR].kmmer<=kL.kmmer ){if(iR==sizeRight){return;}}
+				if(not left[iL].indice==right[iR].indice){
+					update_connected(right[iR]);
+				}
+				//~ while(right[++iR].kmmer<=kL.kmmer ){}
+				while(true){
+					++iR;
+					if(iR>=right.size()){break;}
+					if(not (right[iR].kmmer<=kL.kmmer)){break;}
+				}
 			}
 			if(go){
 				compaction(kL.indice,kR.indice,kL.kmmer);
@@ -276,9 +294,19 @@ void graph3<span>::debruijn(){
 
 		}else{
 			if(kL.kmmer<kR.kmmer){
-				while(left[++iL].kmmer<kR.kmmer){}
+				//~ while(left[++iL].kmmer<kR.kmmer){}
+				while(true){
+					++iL;
+					if(iL>=left.size()){break;}
+					if(not (left[iL].kmmer<kR.kmmer)){break;}
+				}
 			}else{
-				while(right[++iR].kmmer<kL.kmmer){}
+				//~ while(right[++iR].kmmer<kL.kmmer){}
+				while(true){
+					++iR;
+					if(iR>=right.size()){break;}
+					if(not (right[iR].kmmer<kL.kmmer)){break;}
+				}
 			}
 		}
 	}
@@ -295,6 +323,14 @@ bool graph3<span>::output(uint i){
     if (isNumber(unitigs[i][0]))
         return false;
 
+    // Rayan: 
+    // I remember thinking that indexed_left/indexed_right/connected_left/connected_right could not be properly set unless we did compactions at the end of the function above, i.e. using the 'to_compact' variable and doing 'for (auto p: to_compact) compaction(..)'.
+    // but now, in the current version of the code, the 'to_compact' scheme is commented out
+    // (due to https://github.com/GATB/gatb-core/commit/a33d9da4628ea18479798720db4207feb61e445b#diff-cd5d56912653ed079fe11a9d7d5ffbbb)
+    // in order to restore the functionality of indexed_left/indexed_right/connected_left/connected_right, i would need to sit down and think again about it for a while. 
+    // for now, just to be safe, i'm disabling pre_tip_cleaning, which wasn't used anyway. i believe this is the only location where indexed_left/indexed_right/connected_left/connected_right are used 
+    // (in principle it could be possible to avoid doing the pass LinkTigs after bcalm/bglue, but it would need bglue to properly update the links. didn't code that.
+#if 0
     if (pre_tip_cleaning)
     {
         if (indexed_left[i] && indexed_right[i])
@@ -312,6 +348,7 @@ bool graph3<span>::output(uint i){
             }
         }
     }
+#endif 
 
     //std::cout << "returning seq " << unitigs[i] << " indexing l/r " << indexed_left[i] << " " << indexed_right[i] << " connected l/r " << connected_left[i] << " " << connected_right[i] << std::endl;
     return true;
@@ -348,7 +385,7 @@ void graph3<span>::addtuple(tuple<string,uint,uint,uint>& tuple){
     // input tuple: <unitigs string, left minimizer, right minimizer, abundance>
 	unitigs[indiceUnitigs]=get<0>(tuple);
 	unitigs_abundances[indiceUnitigs].push_back(get<3>(tuple));
-    
+
     bool debug = false;
     string debug_kmer = "GTTTTTTAGATTCTGAGTGGAACGATGAATG";
 

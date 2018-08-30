@@ -35,7 +35,7 @@
 #include <stdint.h>
 #include <algorithm>
 #include <iostream>
-//#include <hdf5/hdf5.h>
+#include <hdf5/hdf5.h>
 
 #include <gatb/system/api/Exception.hpp>
 #include <gatb/system/api/config.hpp>
@@ -652,12 +652,12 @@ public:
      * \param[in] isCompound : tells whether the type is composed or not
      * \return a HDF5 identifier for the type.
      */
-    // inline static hid_t hdf5 (bool& isCompound)
-    // {
-    //     hid_t result = H5Tcopy (H5T_NATIVE_INT);
-    //     H5Tset_precision (result, 64*precision);
-    //     return result;
-    // }
+    inline static hid_t hdf5 (bool& isCompound)
+    {
+        hid_t result = H5Tcopy (H5T_NATIVE_INT);
+        H5Tset_precision (result, 64*precision);
+        return result;
+    }
 
     /********************************************************************************/
     /** Computes a kmer value as polynom. We may have conversion from the data buffer to

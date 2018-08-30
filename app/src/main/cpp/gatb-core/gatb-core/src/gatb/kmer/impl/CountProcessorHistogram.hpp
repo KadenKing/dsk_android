@@ -27,6 +27,11 @@
 #include <gatb/tools/storage/impl/Storage.hpp>
 #include <gatb/tools/misc/impl/Histogram.hpp>
 #include <cstdarg>
+#include <gatb/system/impl/System.hpp>
+
+using namespace gatb::core::system;
+using namespace gatb::core::system::impl;
+
 
 /********************************************************************************/
 namespace gatb      {
@@ -53,27 +58,41 @@ public:
     CountProcessorHistogram (
         tools::storage::impl::Group* group = 0,
         size_t histoMax                    = 10000,
-        size_t min_auto_threshold          = 3
+        size_t min_auto_threshold          = 3,
+		bool   histo2Dmode                 = false,
+		bool   histo1Dmode                 = false,
+		std::string histo2Dfilename = "histo2Dfile",
+		std::string histo1Dfilename = "histo1Dfile"
     )
-        : _group(group), _histogram(0), _min_auto_threshold(min_auto_threshold)
+        : _group(group), _histogram(0), _min_auto_threshold(min_auto_threshold),_histo2Dmode(histo2Dmode),_histo2Dfilename(histo2Dfilename),_histo1Dmode(histo1Dmode),_histo1Dfilename(histo1Dfilename)
     {
+
         setHistogram (new tools::misc::impl::Histogram (histoMax));
+		_synchro = System::thread().newSynchronizer(); // synchro that will be passed down to histogramCache in each clone
+
     }
 
     /** Constructor. */
     CountProcessorHistogram (
         tools::storage::impl::Group* group,
         tools::misc::IHistogram* histogram,
-        size_t min_auto_threshold = 3
+        size_t min_auto_threshold = 3,
+		bool   histo2Dmode = false,
+		bool   histo1Dmode = false,
+		std::string histo2Dfilename = "histo2Dfile",
+	    std::string histo1Dfilename = "histo1Dfile"
     )
-        : _group(group), _histogram(0), _min_auto_threshold(min_auto_threshold)
+        : _group(group), _histogram(0), _min_auto_threshold(min_auto_threshold),_histo2Dmode(histo2Dmode),_histo2Dfilename(histo2Dfilename),_histo1Dmode(histo1Dmode),_histo1Dfilename(histo1Dfilename)
     {
+
         setHistogram (histogram);
+		_synchro = 0 ; // no need for another synchro object in the clones
     }
 
     /** Destructor. */
     virtual ~CountProcessorHistogram ()
     {
+		delete _synchro;
         setHistogram(0);
     }
 
@@ -89,6 +108,40 @@ public:
         /** compute auto cutoff **/
         _histogram->compute_threshold (_min_auto_threshold);
 
+		if(_histo2Dmode)
+		{
+			FILE * histo2Dfile = fopen (_histo2Dfilename.c_str(),"w");
+			//output 2D histogram now
+			//printf("output 2D histo gram to file %s \n",_histo2Dfilename.c_str());
+			
+			for(int ii=0; ii<= _histogram->getLength(); ii++)
+			{
+				fprintf(histo2Dfile,"%5i:\t",ii);
+				for(int jj=0; jj<= _histogram->getLength2(); jj++)
+				{
+					fprintf(histo2Dfile,"\t%6lli", _histogram->get2D(ii,jj));
+				}
+				fprintf(histo2Dfile,"\n");
+			}
+			
+			fclose(histo2Dfile);
+		}
+		
+		if(_histo1Dmode)
+		{
+			FILE * histo1Dfile = fopen (_histo1Dfilename.c_str(),"w");
+			
+			//output 1D histogram now
+			for(int ii=1; ii<= _histogram->getLength(); ii++)
+			{
+				fprintf(histo1Dfile,"%i\t%lli",ii,_histogram->get(ii));
+				fprintf(histo1Dfile,"\n");
+			}
+			
+			fclose(histo1Dfile);
+		}
+		
+		
         if (_group != 0)
         {
             /** We save the histogram if any. */
@@ -109,7 +162,7 @@ public:
     CountProcessorAbstract<span>* clone ()
     {
         /** We encapsulate the histogram with a cache. */
-        return new CountProcessorHistogram (_group, new gatb::core::tools::misc::impl::HistogramCache (_histogram),  _min_auto_threshold);
+        return new CountProcessorHistogram (_group, new gatb::core::tools::misc::impl::HistogramCache (_histogram,_synchro),  _min_auto_threshold, _histo2Dmode,_histo1Dmode, _histo2Dfilename,_histo1Dfilename);
     }
 
     /********************************************************************/
@@ -120,6 +173,13 @@ public:
     bool process (size_t partId, const Type& kmer, const CountVector& count, CountNumber sum)
     {
         _histogram->inc (sum);
+		
+		if(_histo2Dmode)
+		{
+			CountNumber sumreads = sum - count[0];
+			_histogram->inc2D (sumreads,count[0]);
+		}
+		
         return true;
     }
 
@@ -153,12 +213,19 @@ public:
 
 private:
 
+
+	system::ISynchronizer* _synchro;
+
     tools::storage::impl::Group* _group;
 
     gatb::core::tools::misc::IHistogram* _histogram;
     void setHistogram (gatb::core::tools::misc::IHistogram* histogram)  { SP_SETATTR(histogram); }
 
     size_t _min_auto_threshold;
+	bool _histo2Dmode;
+	std::string _histo2Dfilename;
+	bool _histo1Dmode;
+	std::string _histo1Dfilename;
 };
 
 /********************************************************************************/

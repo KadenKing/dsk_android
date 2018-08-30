@@ -67,16 +67,19 @@ static const char* simplprogressFormat3 = "removing ec,      pass %2d ";
 
 
 template<typename GraphType, typename Node, typename Edge>
-Simplifications<GraphType, Node, Edge>::Simplifications(GraphType& graph, int nbCores, bool verbose)
-        : _nbTipRemovalPasses(0), _nbBubbleRemovalPasses(0), _nbBulgeRemovalPasses(0), _nbECRemovalPasses(0), _graph(graph), 
+Simplifications<GraphType, Node, Edge>::Simplifications(GraphType *graph, int nbCores, bool verbose)
+        : _nbTipRemovalPasses(0), _nbBubbleRemovalPasses(0), _nbBulgeRemovalPasses(0), _nbECRemovalPasses(0), _graph(*graph), 
         _nbCores(nbCores), _firstNodeIteration(true), _verbose(verbose)
 {
     // by default; do everything
     _doTipRemoval = _doBulgeRemoval = _doECRemoval = true;
 
-    // the next list is only here to get number of nodes
-    ProgressGraphIteratorTemplate<Node,ProgressTimerAndSystem> itNode (this->_graph.iterator(), "");
-    nbNodes = itNode.size();
+    if (graph) // may be called with graph==null in order just to get parameters
+    {
+        // this is just to get number of nodes
+        ProgressGraphIteratorTemplate<Node,ProgressTimerAndSystem> itNode (this->_graph.iterator(), "");
+        nbNodes = itNode.size();
+    }
 
     // compute a fair amount of tips/bubble/ec after which it's useless to do another pass
     // (before, the previous system was to do a fixed amount of passes)
@@ -104,7 +107,8 @@ Simplifications<GraphType, Node, Edge>::Simplifications(GraphType& graph, int nb
 }
 
 
-/* this is the many rounds of graph simplifications that we perform in Minia */
+/* this functions performs many rounds of all available graph simplifications 
+ * this is what Minia does by default */
 template<typename GraphType, typename Node, typename Edge>
 void Simplifications<GraphType,Node,Edge>::simplify()
 {
@@ -273,7 +277,7 @@ double Simplifications<GraphType,Node,Edge>::path2abundance(Direction dir, Path_
     for (size_t i = skip_first; i < p.size() - skip_last; i++)
     {
         Node node = _graph.buildNode((char *)(s.c_str()), i);
-        unsigned char abundance = _graph.queryAbundance(node);
+        int abundance = _graph.queryAbundance(node);
         mean_abundance += abundance;
         //std::cout << " " << to_string(abundance);
         //cout << endl << "node: " << _graph.toString (node) << " abundance: "  << to_string(abundance) << endl;
@@ -293,7 +297,9 @@ inline string maybe_print(long value, string str)
 }
 
 
-/* gets coverage of the simple path,
+/* the RCTC terms is taken from SPADES and means Relative Coverage Tip Clipping
+ * but here i'm using it loosely to mean "Relative Coverage"
+ * this function gets coverage of the simple path,
    then compares it to coverage of other paths connected to the last node of it. */
 template<typename GraphType, typename Node, typename Edge>
 bool Simplifications<GraphType,Node,Edge>::satisfyRCTC(double pathAbundance, Node& node, double RCTCcutoff, Direction dir)
@@ -345,7 +351,9 @@ bool Simplifications<GraphType,Node,Edge>::satisfyRCTC(double pathAbundance, Nod
     return isRCTC;
 }
 
-/* okay let's analyze SPAdes 3.5 tip clipping conditions, just for fun: (following graph_simplifications.hpp and simplifications.info)
+/* this function removes tips in the graph, using an algorithm designed in SPAdes
+ *
+ * here is an in-depth analysis of SPAdes 3.5 tip clipping conditions: (following graph_simplifications.hpp and simplifications.info)
  *
  * * tc_lb is a coefficient, setting tip length to be max(read length, g*tc_lb) (see simplification_settings.hpp);
  *
@@ -488,10 +496,10 @@ unsigned long Simplifications<GraphType,Node,Edge>::removeTips()
             unsigned int pathLen = _graph.simplePathLength(simplePathStart,simplePathDir);
             TIME(auto end_simplepath_t=get_wtime());
             TIME(__sync_fetch_and_add(&timeSimplePath, diff_wtime(start_simplepath_t,end_simplepath_t)));
-            
-            if (k + pathLen >= _maxTipLengthTopological) // "k +" is to take into account that's we're actually traversing a path of extensions from "node"
+           
+            if (k + pathLen > _maxTipLengthTopological) // "k +" is to take into account that's we're actually traversing a path of extensions from "node"
                isShortTopological = false;
-            if (k + pathLen >= _maxTipLengthRCTC) 
+            if (k + pathLen > _maxTipLengthRCTC) 
                isShortRCTC = false;
 
             if (isShortTopological)
@@ -649,7 +657,8 @@ static double unitigs_chain2abundance(vector<int> &unitigs_lengths, vector<int> 
 }
 
 
-/* note: the returned mean abundance does not include start and end nodes */
+/* this function finds the most covered path between start and end node
+ * note: the returned mean abundance does not include start and end nodes */
 // endNode is a node just after the bulge path. it's branching.
 template<typename GraphType, typename Node, typename Edge>
 void Simplifications<GraphType,Node,Edge>::heuristic_most_covered_path(
@@ -1385,7 +1394,7 @@ unsigned long Simplifications<GraphType,Node,Edge>::removeBulges()
 
                 bool isShort = true;
 
-                if (k + pathLen >= maxBulgeLength) // "k +" is to take into account that's we're actually traversing a path of extensions from "node"
+                if (k + pathLen > maxBulgeLength) // "k +" is to take into account that's we're actually traversing a path of extensions from "node"
                 {
                     __sync_fetch_and_add(&nbLongSimplePaths, 1);
                     isShort = false;
@@ -1571,7 +1580,11 @@ unsigned long Simplifications<GraphType,Node,Edge>::removeBulges()
 
 
 
-/* Again, let's see what spades 3.5 does.
+/* this is an algorithm that simplifies the graph, again taken from SPAdes
+ * it removes so-called "erroneous connections" which are Z-shaped motifs in the graph
+ *
+ *
+ * Again, let's see what spades 3.5 does.
  *erroneous connection remover is:
 
  RemoveLowCoverageEdges
@@ -1703,7 +1716,7 @@ unsigned long Simplifications<GraphType,Node,Edge>::removeErroneousConnections()
                         DEBUG_EC(cout << endl << "neighbors " << i+1 << "/" << neighbors.size() << " from: " << _graph.toString (neighbors[i].to) << " dir: " << DIR2STR(dir) << endl);
                         bool isShort = true;
                         
-                        if (k + pathLen >= maxECLength) // "k +" is to take into account that's we're actually traversing a path of extensions from "node"
+                        if (k + pathLen > maxECLength) // "k +" is to take into account that's we're actually traversing a path of extensions from "node"
                         {
                             __sync_fetch_and_add(&nbLongSimplePaths, 1);
                             isShort = false;

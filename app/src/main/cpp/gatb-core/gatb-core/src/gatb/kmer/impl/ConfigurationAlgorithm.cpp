@@ -215,7 +215,7 @@ ConfigurationAlgorithm<span>::ConfigurationAlgorithm (bank::IBank* bank, IProper
     _config._nb_bits_per_kmer = Type::getSize();
     
     std::string storage_type = input->getStr(STR_STORAGE_TYPE);
-    _config._storage_type = /*(storage_type == "hdf5") ? tools::storage::impl::STORAGE_HDF5 :*/ tools::storage::impl::STORAGE_FILE;
+    _config._storage_type = (storage_type == "hdf5") ? tools::storage::impl::STORAGE_HDF5 : tools::storage::impl::STORAGE_FILE;
 }
 
 /*********************************************************************

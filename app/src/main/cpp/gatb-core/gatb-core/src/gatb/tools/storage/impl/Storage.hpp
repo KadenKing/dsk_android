@@ -68,7 +68,7 @@ enum StorageMode_e
     /** Simple file. */
     STORAGE_FILE,
     /** HDF5 file. */
-    //STORAGE_HDF5,
+    STORAGE_HDF5,
     /** Experimental. */
     STORAGE_GZFILE,
     /** Experimental. */

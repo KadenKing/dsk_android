@@ -1031,7 +1031,7 @@ public: // was private: before, but had many compilation errors during the chang
     tools::storage::impl::StorageMode_e _storageMode;
 
     /** Default storage kind. */
-    static const tools::storage::impl::StorageMode_e PRODUCT_MODE_DEFAULT = tools::storage::impl::STORAGE_FILE;
+    static const tools::storage::impl::StorageMode_e PRODUCT_MODE_DEFAULT = tools::storage::impl::STORAGE_HDF5;
 
     /** Storage. */
     tools::storage::impl::Storage* _storage;

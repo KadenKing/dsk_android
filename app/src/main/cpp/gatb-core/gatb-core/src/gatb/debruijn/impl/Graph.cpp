@@ -301,7 +301,7 @@ void build_visitor_solid<Node,Edge,GraphDataVariant>::operator() (GraphData<span
 
     /* create output dir if it doesn't exist */
     if(!System::file().doesExist(props->getStr(STR_URI_OUTPUT_DIR))){
-        int ok = System::file().mkdir(props->getStr(STR_URI_OUTPUT_DIR), 055);
+        int ok = System::file().mkdir(props->getStr(STR_URI_OUTPUT_DIR), 0755);
         if(ok != 0){
             throw system::Exception ("Error: can't create output directory");
         }
@@ -656,10 +656,12 @@ IOptionsParser* GraphTemplate<Node, Edge, GraphDataVariant>::getOptionsParser (b
     OptionsParser* parserDebug = new OptionsParser ("debug ");
 
     // those are only valid for GraphUnitigs, but GraphUnitigs doesn't have custom options (yet) so i'm adding here
+    parserDebug->push_front (new OptionOneParam ("-nb-glue-partitions",       "number of glue partitions (automatically calculated by default)", false, "0"));
+    //parserDebug->push_front (new OptionNoParam  ("-rebuild-graph",       "rebuild the whole graph starting from counted kmers"));
     parserDebug->push_front (new OptionNoParam  ("-skip-links",       "same, but       skip     links"));
     parserDebug->push_front (new OptionNoParam  ("-redo-links",       "same, but       redo     links"));
     parserDebug->push_front (new OptionNoParam  ("-skip-bglue",       "same, but       skip     bglue"));
-    parserDebug->push_front (new OptionNoParam  ("-redo-bglue",       "same, but       redo     bglue     "));
+    parserDebug->push_front (new OptionNoParam  ("-redo-bglue",       "same, but       redo     bglue"));
     parserDebug->push_front (new OptionNoParam  ("-skip-bcalm",       "same, but       skip     bcalm"));
     parserDebug->push_front (new OptionNoParam  ("-redo-bcalm",       "debug function, redo the bcalm algo"));
 
@@ -852,9 +854,9 @@ GraphTemplate<Node, Edge, GraphDataVariant>::GraphTemplate (tools::misc::IProper
 
     string input = params->getStr(STR_URI_INPUT);
 
-    //bool load_from_hdf5 = (system::impl::System::file().getExtension(input) == "h5");
+    bool load_from_hdf5 = (system::impl::System::file().getExtension(input) == "h5");
     bool load_from_file = (system::impl::System::file().isFolderEndingWith(input,"_gatb"));
-    bool load_graph = (/*load_from_hdf5 ||*/ load_from_file);
+    bool load_graph = (load_from_hdf5 || load_from_file);
     if (load_graph)
     {
         /* it's not a bank, but rather a h5 file (kmercounted or more), let's complete it to a graph */
@@ -863,7 +865,7 @@ GraphTemplate<Node, Edge, GraphDataVariant>::GraphTemplate (tools::misc::IProper
         
         /** We create a storage instance. */
         /* (this is actually loading, not creating, the storage at "uri") */
-        _storageMode = /*load_from_hdf5 ? STORAGE_HDF5 :*/ STORAGE_FILE;
+        _storageMode = load_from_hdf5 ? STORAGE_HDF5 : STORAGE_FILE;
         bool append = true; // special storagehdf5 which will open the hdf5 file as read&write
         setStorage (StorageFactory(_storageMode).create (input, false, false, false, append));
     
@@ -871,11 +873,17 @@ GraphTemplate<Node, Edge, GraphDataVariant>::GraphTemplate (tools::misc::IProper
         _state     = (typename GraphTemplate<Node, Edge, GraphDataVariant>::StateMask) atol (getGroup().getProperty ("state").c_str());
         _kmerSize  =                    atol (getGroup().getProperty ("kmer_size").c_str());
 
-        // TODO: code a check that the dsk group exists and put those three lines in, else print an exception
         if (_kmerSize == 0) /* try the dsk group; this assumes kmer counting is done */
             _kmerSize  =    atol (getGroup("dsk").getProperty ("kmer_size").c_str());
         // also assume kmer counting is done
         setState(GraphTemplate<Node, Edge, GraphDataVariant>::STATE_SORTING_COUNT_DONE);
+    
+        
+        /* // doesn't work now with hdf5, because HDF5 attributes already exist and it doesn't like to overwrite them
+        bool debug_rebuild= params->get("-rebuild-graph"); // this is a hidden debug option for now
+        if (debug_rebuild)
+            _state = 7; // init done, configure done, sorting_count done, but that's it
+        */
         
         /** We get library information in the root of the storage. */
         string xmlString = getGroup().getProperty ("xml");
@@ -3245,7 +3253,7 @@ struct queryAbundance_visitor : public boost::static_visitor<int>    {
         unsigned long hashIndex = getNodeIndex<span>(data, node);
     	if(hashIndex == ULLONG_MAX) return 0; // node was not found in the mphf 
 
-        unsigned char value = (*(data._abundance)).at(hashIndex);
+        int value = data._abundance->abundanceAt(hashIndex); // uses discretized abundance
 
         return value;
     }
@@ -3728,7 +3736,7 @@ template<typename Node, typename Edge, typename GraphDataVariant>
 void GraphTemplate<Node, Edge, GraphDataVariant>::simplify(unsigned int nbCores, bool verbose)
 {
         Simplifications<GraphTemplate<Node, Edge, GraphDataVariant>,Node,Edge> 
-            graphSimplifications(*this, nbCores, verbose);
+            graphSimplifications(this, nbCores, verbose);
         graphSimplifications.simplify();
 }
 

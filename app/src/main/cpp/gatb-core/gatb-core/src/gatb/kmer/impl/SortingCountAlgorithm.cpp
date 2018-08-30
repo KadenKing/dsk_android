@@ -32,7 +32,6 @@
 #include <gatb/bank/impl/Bank.hpp>
 #include <gatb/tools/collections/impl/IterableHelpers.hpp>
 #include <cmath>
-#include <android/log.h>
 
 #define DEBUG(a)  //printf a
 
@@ -203,12 +202,10 @@ template<size_t span>
 IOptionsParser* SortingCountAlgorithm<span>::getOptionsParser (bool mandatory)
 {
     IOptionsParser* parser = new OptionsParser ("kmer count");
-    __android_log_print(ANDROID_LOG_INFO,"sorting algorithm","got here");
+
     string abundanceMax = Stringify::format("%ld", std::numeric_limits<CountNumber>::max());
 
-    //parser->push_back (new OptionOneParam (STR_URI_INPUT,         "reads file", mandatory ));
-
-    parser->push_back (new OptionOneParam (STR_URI_INPUT,         "reads file", false, "/data/user/0/mo.bioinf.bmark/files/fastq/test1.fastq"));
+    parser->push_back (new OptionOneParam (STR_URI_INPUT,         "reads file", mandatory ));
     parser->push_back (new OptionOneParam (STR_KMER_SIZE,         "size of a kmer",                                 false, "31"    ));
     parser->push_back (new OptionOneParam (STR_KMER_ABUNDANCE_MIN,"min abundance threshold for solid kmers",        false, "2"     ));
     parser->push_back (new OptionOneParam (STR_KMER_ABUNDANCE_MAX,"max abundance threshold for solid kmers",        false, abundanceMax));
@@ -216,21 +213,22 @@ IOptionsParser* SortingCountAlgorithm<span>::getOptionsParser (bool mandatory)
     parser->push_back (new OptionOneParam (STR_HISTOGRAM_MAX,     "max number of values in kmers histogram",        false, "10000"));
     parser->push_back (new OptionOneParam (STR_SOLIDITY_KIND,     "way to compute counts of several files (sum, min, max, one, all, custom)",false, "sum"));
 	parser->push_back (new OptionOneParam (STR_SOLIDITY_CUSTOM,   "when solidity-kind is cutom, specifies list of files where kmer must be present",false, ""));
-    parser->push_back (new OptionOneParam (STR_MAX_MEMORY,        "max memory (in MBytes)",                         false, "2000"));
-    parser->push_back (new OptionOneParam (STR_MAX_DISK,          "max disk   (in MBytes)",                         false, "20000"));
-    parser->push_back (new OptionOneParam (STR_URI_SOLID_KMERS,   "output file for solid kmers (only when constructing a graph)", false, "/data/user/0/mo.bioinf.bmark/files"));
+    parser->push_back (new OptionOneParam (STR_MAX_MEMORY,        "max memory (in MBytes)",                         false, "5000"));
+    parser->push_back (new OptionOneParam (STR_MAX_DISK,          "max disk   (in MBytes)",                         false, "0"));
+    parser->push_back (new OptionOneParam (STR_URI_SOLID_KMERS,   "output file for solid kmers (only when constructing a graph)", false));
     parser->push_back (new OptionOneParam (STR_URI_OUTPUT,        "output file",                                    false));
-    parser->push_back (new OptionOneParam (STR_URI_OUTPUT_DIR,    "output directory",                               false, "/data/user/0/mo.bioinf.bmark/files"));
-    parser->push_back (new OptionOneParam (STR_URI_OUTPUT_TMP,    "output directory for temporary files",           false, "/data/user/0/mo.bioinf.bmark/files"));
+    parser->push_back (new OptionOneParam (STR_URI_OUTPUT_DIR,    "output directory",                               false, "."));
+    parser->push_back (new OptionOneParam (STR_URI_OUTPUT_TMP,    "output directory for temporary files",           false, "."));
     parser->push_back (new OptionOneParam (STR_COMPRESS_LEVEL,    "h5 compression level (0:none, 9:best)",          false, "0"));
-    parser->push_back (new OptionOneParam (STR_STORAGE_TYPE,      "storage type of kmer counts ('hdf5' or 'file')", false, "file"  ));
+    parser->push_back (new OptionOneParam (STR_STORAGE_TYPE,      "storage type of kmer counts ('hdf5' or 'file')", false, "hdf5"  ));
+	parser->push_back (new OptionOneParam (STR_HISTO2D,"compute the 2D histogram (with first file = genome, remaining files = reads)",false,"0"));
+	parser->push_back (new OptionOneParam (STR_HISTO,"output the kmer abundance histogram",false,"0"));
 
+    IOptionsParser* devParser = new OptionsParser ("kmer count, advanced performance tweaks");
 
-    IOptionsParser* devParser = new OptionsParser ("kmer count, algorithmic options");
-
-    devParser->push_back (new OptionOneParam (STR_MINIMIZER_TYPE,    "minimizer type (0=lexi, 1=freq)",                false, "1"));
+    devParser->push_back (new OptionOneParam (STR_MINIMIZER_TYPE,    "minimizer type (0=lexi, 1=freq)",                false, "0"));
     devParser->push_back (new OptionOneParam (STR_MINIMIZER_SIZE,    "size of a minimizer",                            false, "10"));
-    devParser->push_back (new OptionOneParam (STR_REPARTITION_TYPE,  "minimizer repartition (0=unordered, 1=ordered)", false, "1"));
+    devParser->push_back (new OptionOneParam (STR_REPARTITION_TYPE,  "minimizer repartition (0=unordered, 1=ordered)", false, "0"));
     parser->push_back (devParser);
 
     return parser;
@@ -267,6 +265,72 @@ ICountProcessor<span>* SortingCountAlgorithm<span>::getDefaultProcessor (
     tools::storage::impl::Storage*  otherStorage
 )
 {
+	
+	std::string histo2Dstorage_filename;
+	// build histo2D filename
+	int using_histo_2D = params->get(STR_HISTO2D) ? params->getInt(STR_HISTO2D) : 0 ;
+	if(using_histo_2D)
+	{
+		if(params->get(STR_URI_OUTPUT))
+		{
+			std::string uri_input = params->getStr(STR_URI_OUTPUT);
+			histo2Dstorage_filename =  uri_input + ".histo2D";
+		}
+		else
+		if(params->get(STR_URI_INPUT))
+		{
+			std::string uri_input = params->getStr(STR_URI_INPUT);
+			std::string delimiter = ",";
+			std::string firstbankname = uri_input.substr(0, uri_input.find(delimiter));
+			histo2Dstorage_filename =  system::impl::System::file().getBaseName(firstbankname) + ".histo2D";
+		}
+		else if(params->get(STR_URI_FILE))
+		{
+			std::string uri_input = params->getStr(STR_URI_FILE);
+			std::string delimiter = ",";
+			std::string firstbankname = uri_input.substr(0, uri_input.find(delimiter));
+			histo2Dstorage_filename =  system::impl::System::file().getBaseName(firstbankname) + ".histo2D";
+		}
+		else
+		{
+			histo2Dstorage_filename = "histo2D_resultfile";
+		}
+
+	}
+	//histo1D filename
+	std::string histo1Dstorage_filename;
+
+	int using_histo_1D = params->get(STR_HISTO) ? params->getInt(STR_HISTO) : 0 ;
+	if(using_histo_1D)
+	{
+		if(params->get(STR_URI_OUTPUT))
+		{
+			std::string uri_input = params->getStr(STR_URI_OUTPUT);
+			histo1Dstorage_filename =  uri_input + ".histo";
+		}
+		else
+			if(params->get(STR_URI_INPUT))
+			{
+				std::string uri_input = params->getStr(STR_URI_INPUT);
+				std::string delimiter = ",";
+				std::string firstbankname = uri_input.substr(0, uri_input.find(delimiter));
+				histo1Dstorage_filename =  system::impl::System::file().getBaseName(firstbankname) + ".histo";
+			}
+			else if(params->get(STR_URI_FILE))
+			{
+				std::string uri_input = params->getStr(STR_URI_FILE);
+				std::string delimiter = ",";
+				std::string firstbankname = uri_input.substr(0, uri_input.find(delimiter));
+				histo1Dstorage_filename =  system::impl::System::file().getBaseName(firstbankname) + ".histo";
+			}
+			else
+			{
+				histo1Dstorage_filename = "histo_resultfile";
+			}
+		
+	}
+	
+	
     CountProcessor* result = 0;
 
     if (otherStorage == 0)  { otherStorage = dskStorage; }
@@ -283,7 +347,11 @@ ICountProcessor<span>* SortingCountAlgorithm<span>::getDefaultProcessor (
         new CountProcessorHistogram<span> (
             & otherStorage->getGroup("histogram"),
             params->getInt(STR_HISTOGRAM_MAX),
-            params->getInt(STR_KMER_ABUNDANCE_MIN_THRESHOLD)
+            params->getInt(STR_KMER_ABUNDANCE_MIN_THRESHOLD),
+			using_histo_2D,
+			using_histo_1D,
+			histo2Dstorage_filename,
+			histo1Dstorage_filename
         ),
 
         CountProcessorSolidityFactory<span>::create (*params),
@@ -355,6 +423,7 @@ vector<ICountProcessor<span>*> SortingCountAlgorithm<span>::getDefaultProcessorV
     Storage*        otherStorage
 )
 {
+
     vector<ICountProcessor<span>*> result;
 
     ICountProcessor<span>* dskProcessor = getDefaultProcessor (params, dskStorage, otherStorage);
@@ -428,7 +497,6 @@ void SortingCountAlgorithm<span>::configure ()
 
     /** We may have to create a default storage. */
     Storage* storage = 0;
-
     if (_repartitor==0 || _processors.size() == 0)
     {
         string output = getInput()->get(STR_URI_OUTPUT) ?
@@ -444,9 +512,8 @@ void SortingCountAlgorithm<span>::configure ()
         }
 
         string storage_type = getInput()->getStr(STR_STORAGE_TYPE);
-        if (storage_type == "hdf5"){
-            //_storage_type = tools::storage::impl::STORAGE_HDF5;
-        }
+        if (storage_type == "hdf5")
+            _storage_type = tools::storage::impl::STORAGE_HDF5;
         else
         {
             if (storage_type == "file")
@@ -485,15 +552,40 @@ void SortingCountAlgorithm<span>::configure ()
         setRepartitor (new Repartitor(storage->getGroup("minimizers")));
     }
 
+	
+	//out file name for histo2D
+	string output_histo2Dname  = getInput()->get(STR_URI_OUTPUT) ?
+	getInput()->getStr(STR_URI_OUTPUT) + ".histo2D"   :
+	(getInput()->getStr(STR_URI_OUTPUT_DIR) + "/" + system::impl::System::file().getBaseName (_bank->getIdNb(0))) + ".histo2D";
+	
+	//printf("out histo name %s  \n",output_histo2Dname.c_str());
 
 	/** We check that the processor is ok, otherwise we build one. */
-    if (_processors.size() == 0)  {
-        _processors = getDefaultProcessorVector(_config, getInput(), storage, storage);
-    };
+    if (_processors.size() == 0)  { _processors = getDefaultProcessorVector(_config, getInput(), storage, storage);  };
 
-    //DEBUG (("SortingCountAlgorithm<span>::configure  END  _bank=%p  _config.isComputed=%d  _repartitor=%p  storage=%p\n",
-    //    _bank, _config._isComputed, _repartitor, storage
-    //));
+	
+	/** We check if options are compatible with histo2D */
+	int using_histo_2D = getInput()->get(STR_HISTO2D) ? getInput()->getInt(STR_HISTO2D) : 0 ;
+	if(using_histo_2D)
+	{
+
+		getInput()->setStr(STR_SOLIDITY_KIND, "all");
+		_config._solidityKind = KMER_SOLIDITY_ALL;
+	
+		//check number of banks, must be greater than 1
+		int nbanks = _bank->getBanks().size();
+
+		if( nbanks <2 )
+		{
+			fprintf(stderr,"There must be at least 2 input banks when using -histo2D \n");
+			exit(1);
+		}
+		
+	}
+	
+    DEBUG (("SortingCountAlgorithm<span>::configure  END  _bank=%p  _config.isComputed=%d  _repartitor=%p  storage=%p\n",
+        _bank, _config._isComputed, _repartitor, storage
+    ));
 }
 
 /*********************************************************************

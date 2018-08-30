@@ -652,6 +652,7 @@ template<size_t SPAN>
 void bglue(Storage *storage, 
         std::string prefix,
         int kmerSize, 
+        int nb_glue_partitions, 
         int nb_threads, 
         bool verbose
         )
@@ -667,12 +668,19 @@ void bglue(Storage *storage,
     bool debug_uf_stats = false; // formerly cmdline parameter
     bool only_uf = false; // idem
 
+    logging("Starting bglue with " + std::to_string( nb_threads) + " threads");
+
     //int nbGluePartitions=200; // no longer fixed 
     // autodetecting number of partitions
     int max_open_files = System::file().getMaxFilesNumber() / 2;
     int nbGluePartitions = std::min(2000, max_open_files); // ceil it at 2000 anyhow
 
-    logging("Starting bglue with " + std::to_string( nb_threads) + " threads");
+    if (nb_glue_partitions > 0)
+    {
+        nbGluePartitions = nb_glue_partitions;
+        logging("Using user-defined number of glue partitions: " + std::to_string( nb_glue_partitions));
+    }
+
 
     // create a hasher for UF
     typedef typename Kmer<SPAN>::ModelCanonical ModelCanon;
@@ -724,14 +732,13 @@ void bglue(Storage *storage,
     }
     if (uf_hashes.size() == 0) // prevent an edge case when there's nothing to glue, boophf doesn't like it
         uf_hashes.push_back(0);
-    for (int pass = 0; pass < nb_prepare_passes; pass++)
-        System::file().remove (prefix+".glue.hashes." + to_string(pass));
 
     unsigned long nb_uf_keys = uf_hashes.size();
-    logging("loaded all unique UF elements (" + std::to_string(nb_uf_keys) + ") into a single file vector of size " + to_string(nb_uf_keys* sizeof(partition_t) / 1024/1024) + " MB");
+    logging("loaded all unique UF elements (" + std::to_string(nb_uf_keys) + ") into a single vector of size " + to_string(nb_uf_keys* sizeof(partition_t) / 1024/1024) + " MB");
 
     int gamma = 3; // make it even faster.
-
+ 
+    // TODO: why not iterate the UF hashes from disk instead of loading them in memory?
     boomphf::mphf<partition_t , /*TODO we don't need hasher_t here now that we're not hashing kmers, but I forgot to change*/ hasher_t< partition_t> > uf_mphf(nb_uf_keys, uf_hashes, nb_threads, gamma, verbose);
 
     free_memory_vector(uf_hashes);
@@ -742,9 +749,9 @@ void bglue(Storage *storage,
         logging("UF MPHF constructed (" + std::to_string(uf_mphf_memory/8/1024/1024) + " MB)" );
     }
 
-
     // create a UF data structure
-    unionFind<uint32_t> ufkmers(nb_uf_keys);
+    // this one stores nb_uf_keys * uint64_t (actually, atomic's). so it's bigger than uf_hashes
+    unionFind ufkmers(nb_uf_keys);
 
 #if 0
     unionFind<unsigned int> ufmin;
@@ -834,6 +841,11 @@ void bglue(Storage *storage,
 
 
     logging("UF constructed");
+
+    // remove the UF hashes, could have done that earlier (right before bbhash), but i'd like to keep them in case of segfault
+    for (int pass = 0; pass < nb_prepare_passes; pass++)
+        System::file().remove (prefix+".glue.hashes." + to_string(pass));
+
 
     if (debug_uf_stats) // for debugging
     {

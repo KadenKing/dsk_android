@@ -322,7 +322,7 @@ void DebloomMinimizerAlgorithm<span>::execute_aux (
 
     /** We use a temporary partition that will hold the neighbors extension of the solid kmers. */
     string partitionsFilename = System::file().getTemporaryFilename("debloom_partitions");
-    Storage* cfpPartitions = StorageFactory(STORAGE_FILE).create (partitionsFilename, true, false);
+    Storage* cfpPartitions = StorageFactory(STORAGE_HDF5).create (partitionsFilename, true, false);
     LOCAL (cfpPartitions);
     Partition<Type>* debloomParts = & (*cfpPartitions)().getPartition<Type> ("parts", nbPartitions);
 

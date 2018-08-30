@@ -31,7 +31,7 @@
 #include <iostream>
 #include <gatb/system/api/types.hpp>
 #include <gatb/tools/misc/api/Abundance.hpp>
-//#include <hdf5/hdf5.h>
+#include <hdf5/hdf5.h>
 
 /********************************************************************************/
 namespace gatb  {
@@ -78,10 +78,10 @@ public:
     }
 
     /********************************************************************************/
-    // inline static hid_t hdf5 (bool& isCompound)
-    // {
-    //     // return H5Tcopy (H5T_NATIVE_UINT8);
-    // }
+    inline static hid_t hdf5 (bool& isCompound)
+    {
+        return H5Tcopy (H5T_NATIVE_UINT8);
+    }
 };
 
 /********************************************************************************/

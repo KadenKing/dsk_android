@@ -233,7 +233,7 @@ void Leon::createBloom (){
 	u_int64_t nb_kmers_infile;
 	
 	//cout << _dskOutputFilename << endl;
-	Storage* storage = StorageFactory(STORAGE_FILE).load (_dskOutputFilename);
+	Storage* storage = StorageFactory(STORAGE_HDF5).load (_dskOutputFilename);
 	LOCAL (storage);
 	
 	Partition<kmer_count> & solidCollection = storage->root().getGroup("dsk").getPartition<kmer_count> ("solid");
@@ -480,7 +480,7 @@ void Leon::executeCompression(){
 
 //	_outputFile = System::file().newFile(_outputFilename, "wb");
 	
-	_storageH5file = StorageFactory(STORAGE_FILE).create (_outputFilename, true, false,true);
+	_storageH5file = StorageFactory(STORAGE_HDF5).create (_outputFilename, true, false,true);
 
 	_groupLeon    = new tools::storage::impl::Group((*_storageH5file)().getGroup      ("leon"));
 	_subgroupInfo = new tools::storage::impl::Group((*_storageH5file)().getGroup   ("metadata"));
@@ -1330,7 +1330,7 @@ void Leon::executeDecompression(){
         ss << "File not found: " << _inputFilename;
         throw Exception (ss.str().c_str());
     }
-    _storageH5file = StorageFactory(STORAGE_FILE).create (_inputFilename,false,false,true); //open without adding extension h5
+    _storageH5file = StorageFactory(STORAGE_HDF5).create (_inputFilename,false,false,true); //open without adding extension h5
 	_groupLeon = new tools::storage::impl::Group((*_storageH5file)().getGroup   ("leon"));
 	_subgroupInfo = new tools::storage::impl::Group((*_storageH5file)().getGroup   ("metadata"));
 	_subgroupDict = new tools::storage::impl::Group((*_storageH5file)().getGroup   ("leon/anchors"));
@@ -2411,7 +2411,7 @@ IBank* BankLeonFactory::createBank (const std::string& uri)
 	try {
 		isLEON = true;
 		
-		auto storageH5file = StorageFactory(STORAGE_FILE).create (uri,false,false,true); //open without adding extension h5
+		auto storageH5file = StorageFactory(STORAGE_HDF5).create (uri,false,false,true); //open without adding extension h5
 
 		
 		//auto groupLeon = new tools::storage::impl::Group((*storageH5file)().getGroup   ("leon"));

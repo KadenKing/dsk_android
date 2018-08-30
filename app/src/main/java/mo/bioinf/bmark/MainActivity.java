@@ -31,7 +31,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private int kmer = 32;
+    private int kmer = 31;
     private int memory = 2000;
     private int disk = 20000;
     private String fullPath = "";

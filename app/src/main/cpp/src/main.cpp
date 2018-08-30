@@ -53,15 +53,6 @@ using namespace std;
 //    return EXIT_SUCCESS;
 //}
 
-void makeArgv(string path, int kmer, int memory, int disk);
-void makeArgv(string path, int kmer, int memory, int disk, char* argv[]){
-    string strK, strM, strD;
-    strK = to_string(kmer);
-    strM = to_string(memory);
-    strD = to_string(disk);
-    char* ans[] = {"./dsk", "-file", &path[0u], "-kmer-size", &strK[0u], "-max-memory", &strM[0u], "-max-disk", &strD[0u]};
-    argv = ans;
-}
 
 
 extern "C"
@@ -74,14 +65,20 @@ Java_mo_bioinf_bmark_MainActivity_stringFromJNI(JNIEnv *env, jobject instance, j
     strM = to_string(memory);
     strD = to_string(disk);
 
+    __android_log_print(ANDROID_LOG_INFO,"file",javaPath.c_str());
+    __android_log_print(ANDROID_LOG_INFO,"kmer",&strK[0u]);
+    __android_log_print(ANDROID_LOG_INFO,"mem",&strM[0u]);
+    __android_log_print(ANDROID_LOG_INFO,"disk",&strD[0u]);
+
     char *argv[] = {"./dsk", "-file", &javaPath[0u], "-kmer-size", &strK[0u], "-max-memory", &strM[0u], "-max-disk", &strD[0u]};
+    //char *argv[] = {"./dsk", "-file", &javaPath[0u]};
+
     //makeArgv(javaPath,kmer,memory,disk,argv);
 
     string strDuration;
     try{
         chrono::high_resolution_clock::time_point t1 = chrono::high_resolution_clock::now();
-        DSK().run(9,argv);
-
+        DSK().run(3,argv);
         chrono::high_resolution_clock::time_point t2 = chrono::high_resolution_clock::now();
         auto duration = chrono::duration_cast<chrono::seconds>( t2 - t1 ).count();
         strDuration = to_string(duration);

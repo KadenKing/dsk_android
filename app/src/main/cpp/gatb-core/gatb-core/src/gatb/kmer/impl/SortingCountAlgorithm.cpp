@@ -228,7 +228,7 @@ IOptionsParser* SortingCountAlgorithm<span>::getOptionsParser (bool mandatory)
 
     devParser->push_back (new OptionOneParam (STR_MINIMIZER_TYPE,    "minimizer type (0=lexi, 1=freq)",                false, "0"));
     devParser->push_back (new OptionOneParam (STR_MINIMIZER_SIZE,    "size of a minimizer",                            false, "10"));
-    devParser->push_back (new OptionOneParam (STR_REPARTITION_TYPE,  "minimizer repartition (0=unordered, 1=ordered)", false, "1"));
+    devParser->push_back (new OptionOneParam (STR_REPARTITION_TYPE,  "minimizer repartition (0=unordered, 1=ordered)", false, "0"));
     parser->push_back (devParser);
 
     return parser;

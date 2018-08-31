@@ -46,6 +46,17 @@ public class SettingsActivity extends AppCompatActivity {
         final Spinner minimizer_spinner = (Spinner) findViewById(R.id.minimizer_spinner);
         final Spinner repartition_spinner = (Spinner) findViewById(R.id.repartition_spinner);
 
+
+
+        /*set the input fields to their current values*/
+        num_kmer.setText(String.valueOf(getIntent().getIntExtra("kmer",-1)));
+        num_disk.setText(String.valueOf(getIntent().getIntExtra("disk",-1)));
+        num_mem.setText(String.valueOf(getIntent().getIntExtra("memory",-1)));
+
+        minimizer_spinner.setSelection(getIntent().getIntExtra("minimizer_type",-1));
+        repartition_spinner.setSelection(getIntent().getIntExtra("repartition_type",-1));
+
+
         done_button.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
                 int kmer = Integer.parseInt(num_kmer.getText().toString());

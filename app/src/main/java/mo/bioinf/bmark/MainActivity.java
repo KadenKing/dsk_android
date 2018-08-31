@@ -40,17 +40,38 @@ public class MainActivity extends AppCompatActivity {
     private int minimizer_type = 0;
 
 
+    private String minimizer2string(int minimizer_type)
+    {
+        if(minimizer_type == 0)
+            return "Lexicographic";
+        if(minimizer_type == 1)
+            return "Frequency";
 
+
+        return "";
+    }
+
+    private String repartition2string(int repartition_type)
+    {
+        if(repartition_type == 0)
+            return "Unordered";
+        if(repartition_type == 1)
+            return "Ordered";
+
+        return "";
+    }
     // Used to load the 'native-lib' library on application startup.
     static {
         System.loadLibrary("dsk");
     }
 
-    void updateTV(TextView tv, int kmer, int memory, int disk, String path){
+    void updateTV(TextView tv, int kmer, int memory, int disk, String path, int repartition_type, int minimizer_type){
         String text = "kmer: " + kmer + "\n" +
                         "memory: " + memory + "\n" +
                         " disk: " + disk + "\n" +
-                        "path: " + path + "\n";
+                        "path: " + path + "\n" +
+                        "repartition type: " + repartition2string(repartition_type) + "\n" +
+                        "minimizer type: " + minimizer2string(minimizer_type) + "\n";
         tv.setText(text);
     }
 
@@ -82,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
             this.repartition_type = data.getIntExtra("repartition_type", -2);
 
             final TextView tv = (TextView) findViewById(R.id.sample_text);
-            updateTV(tv,kmer,memory,disk,fullPath);
+            updateTV(tv,kmer,memory,disk,fullPath,repartition_type,minimizer_type);
         }
 
 
@@ -120,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
             {
                 String selectedItem = parent.getItemAtPosition(position).toString();
                 fullPath = base_path  + selectedItem;
-                updateTV(tv,kmer,memory,disk,fullPath);
+                updateTV(tv,kmer,memory,disk,fullPath,repartition_type,minimizer_type);
 
 
                 /*makes sure that if we press the run button the app won't crash due to a file permission error*/
@@ -158,7 +179,15 @@ public class MainActivity extends AppCompatActivity {
 
         settings_button.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
+
                 Intent myIntent = new Intent(getBaseContext(), SettingsActivity.class);
+
+                //send current parameters to fill to pre-fill the form
+                myIntent.putExtra("kmer",kmer);
+                myIntent.putExtra("memory",memory);
+                myIntent.putExtra("disk",disk);
+                myIntent.putExtra("minimizer_type",minimizer_type);
+                myIntent.putExtra("repartition_type",repartition_type);
                 MainActivity.this.startActivityForResult(myIntent,1);
 
 

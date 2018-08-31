@@ -1,5 +1,6 @@
 package mo.bioinf.bmark;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -38,6 +39,12 @@ public class DSKRunning extends AppCompatActivity {
             @Override
             public void run(){
                 String runtime = stringFromJNI(path,base_path,kmer,memory,disk,repartition_type,minimizer_type);
+
+                Intent results_intent = new Intent(getBaseContext(),ResultsActivity.class);
+                results_intent.putExtra("runtime", runtime);
+                DSKRunning.this.startActivity(results_intent);
+
+
                 finish();
             }
         };

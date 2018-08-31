@@ -12,5 +12,6 @@
         <item>Ordered</item>
     </string-array>
     <string name="title_activity_dskrunning">DSKRunning</string>
+    <string name="title_activity_results">ResultsActivity</string>
 
 </resources>

@@ -27,6 +27,7 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -60,10 +61,7 @@ public class MainActivity extends AppCompatActivity {
 
         return "";
     }
-    // Used to load the 'native-lib' library on application startup.
-    static {
-        System.loadLibrary("dsk");
-    }
+
 
     void updateTV(TextView tv, int kmer, int memory, int disk, String path, int repartition_type, int minimizer_type){
         String text = "kmer: " + kmer + "\n" +
@@ -166,16 +164,9 @@ public class MainActivity extends AppCompatActivity {
         final ViewFlipper flipper = (ViewFlipper) findViewById(R.id.flipper);
 
 
-        final Runnable DSK = new Runnable(){
-            @Override
-            public void run(){
-                String x = stringFromJNI(fullPath,devicePath,kmer,memory,disk,repartition_type,minimizer_type);
-                flipper.showNext();
-                tv.setText(x);
-            }
-        };
 
-        final Handler dskHandler = new Handler();
+
+
 
         settings_button.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
@@ -197,8 +188,23 @@ public class MainActivity extends AppCompatActivity {
 
         run.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-                flipper.showNext();
-                dskHandler.postDelayed(DSK,500);
+                Intent dskIntent = new Intent(getBaseContext(),DSKRunning.class);
+                dskIntent.putExtra("path",fullPath);
+                dskIntent.putExtra("base_path", devicePath);
+                dskIntent.putExtra("kmer", kmer);
+                dskIntent.putExtra("memory",memory);
+                dskIntent.putExtra("disk",disk);
+                dskIntent.putExtra("repartition_type",repartition_type);
+                dskIntent.putExtra("minimizer_type",minimizer_type);
+
+
+
+                MainActivity.this.startActivity(dskIntent);
+
+
+                //flipper.showNext();
+
+
 
 
             }
@@ -212,7 +218,6 @@ public class MainActivity extends AppCompatActivity {
      * A native method that is implemented by the 'native-lib' native library,
      * which is packaged with this application.
      */
-    public native String stringFromJNI(String path, String base_path, int kmer, int memory, int disk, int repartition_type, int minimizer_type);
 
 
 

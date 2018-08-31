@@ -22,6 +22,10 @@
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".DSKRunning"
+            android:label="@string/title_activity_dskrunning"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

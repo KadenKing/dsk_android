@@ -59,28 +59,7 @@
             android:layout_marginTop="36dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@android:drawable/ic_menu_edit" />
-
-    </android.support.constraint.ConstraintLayout>
-
-    <android.support.constraint.ConstraintLayout
-        android:id="@+id/dsk_running"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <ProgressBar
-            android:id="@+id/progressBar"
-            style="@style/Widget.AppCompat.ProgressBar"
-            android:layout_width="76dp"
-            android:layout_height="73dp"
-            android:layout_marginBottom="235dp"
-            android:layout_marginEnd="168dp"
-            android:layout_marginStart="168dp"
-            android:layout_marginTop="228dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:srcCompat="@drawable/ic_settings_2" />
 
     </android.support.constraint.ConstraintLayout>
 

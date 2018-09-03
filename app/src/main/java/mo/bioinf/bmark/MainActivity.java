@@ -48,8 +48,8 @@ public class MainActivity extends AppCompatActivity {
                         "memory: " + memory + "\n" +
                         " disk: " + disk + "\n" +
                         "path: " + path + "\n" +
-                        "repartition type: " + repartition2string(repartition_type) + "\n" +
-                        "minimizer type: " + minimizer2string(minimizer_type) + "\n";
+                        "repartition type: " + parcel.repartition2string() + "\n" +
+                        "minimizer type: " + parcel.minimizer2string() + "\n";
         tv.setText(text);
     }
 
@@ -74,14 +74,23 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         if(data != null){
-            this.kmer = data.getIntExtra("kmer",0);
-            this.memory = data.getIntExtra("memory",0);
-            this.disk = data.getIntExtra("disk",0);
-            this.minimizer_type = data.getIntExtra("minimizer_type", -2);
-            this.repartition_type = data.getIntExtra("repartition_type", -2);
+            DSK_Parcel returnParcel = data.getParcelableExtra("returnParcel");
+
+            returnParcel.setFullPath(parcel.getFullPath());
+            returnParcel.setFilename(parcel.getFilename());
+            returnParcel.setDevicePath(parcel.getDevicePath());
+            parcel = returnParcel;
+
+
+//            parcel.setKmer(data.getIntExtra("kmer",0));
+//            parcel.setMemory(data.getIntExtra("memory",0));
+//            parcel.setDisk(data.getIntExtra("disk",0));
+//            parcel.setMinimizer_type(data.getIntExtra("minimizer_type", -2));
+//            parcel.setRepartition_type(data.getIntExtra("repartition_type", -2));
 
             final TextView tv = (TextView) findViewById(R.id.sample_text);
-            updateTV(tv,kmer,memory,disk,fullPath,repartition_type,minimizer_type);
+            updateTV(tv, parcel.getKmer(),parcel.getMemory(), parcel.getDisk(),parcel.getFullPath(),
+                    parcel.getRepartition_type(), parcel.getMinimizer_type());
         }
 
 
@@ -101,8 +110,8 @@ public class MainActivity extends AppCompatActivity {
         run.setEnabled(false);
 
         final String base_path = context.getFilesDir().getAbsolutePath().toString() + "/fastq/"; // this phone's working directory
-        devicePath = context.getFilesDir().getAbsolutePath().toString();
-        this.fullPath = base_path;
+        parcel.setDevicePath(context.getFilesDir().getAbsolutePath().toString());
+        parcel.setFullPath(base_path);
 
         populateDropdown(context, dropdown, base_path); // fills the dropdown with the files in the fastq folder
 
@@ -118,14 +127,15 @@ public class MainActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
             {
                 String selectedItem = parent.getItemAtPosition(position).toString();
-                filename = selectedItem;
-                fullPath = base_path  + selectedItem;
-                updateTV(tv,kmer,memory,disk,fullPath,repartition_type,minimizer_type);
+                parcel.setFilename(selectedItem);
+                parcel.setFullPath(base_path  + selectedItem);
+                updateTV(tv, parcel.getKmer(),parcel.getMemory(), parcel.getDisk(),parcel.getFullPath(),
+                        parcel.getRepartition_type(), parcel.getMinimizer_type());
 
 
                 /*makes sure that if we press the run button the app won't crash due to a file permission error*/
                 checkPermission();
-                if (tryOpenFile(context,fullPath) && isExternalStorageReadable() && isExternalStorageWritable()) {
+                if (tryOpenFile(context,parcel.getFullPath()) && isExternalStorageReadable() && isExternalStorageWritable()) {
                     run.setEnabled(true);
                 }
 
@@ -153,13 +163,13 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v){
 
                 Intent myIntent = new Intent(getBaseContext(), SettingsActivity.class);
-
+                myIntent.putExtra("parcel",parcel);
                 //send current parameters to fill to pre-fill the form
-                myIntent.putExtra("kmer",kmer);
-                myIntent.putExtra("memory",memory);
-                myIntent.putExtra("disk",disk);
-                myIntent.putExtra("minimizer_type",minimizer_type);
-                myIntent.putExtra("repartition_type",repartition_type);
+//                myIntent.putExtra("kmer",kmer);
+//                myIntent.putExtra("memory",memory);
+//                myIntent.putExtra("disk",disk);
+//                myIntent.putExtra("minimizer_type",minimizer_type);
+//                myIntent.putExtra("repartition_type",repartition_type);
                 MainActivity.this.startActivityForResult(myIntent,1);
 
 
@@ -170,14 +180,15 @@ public class MainActivity extends AppCompatActivity {
         run.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
                 Intent dskIntent = new Intent(getBaseContext(),DSKRunning.class);
-                dskIntent.putExtra("path",fullPath);
-                dskIntent.putExtra("base_path", devicePath);
-                dskIntent.putExtra("kmer", kmer);
-                dskIntent.putExtra("memory",memory);
-                dskIntent.putExtra("disk",disk);
-                dskIntent.putExtra("repartition_type",repartition_type);
-                dskIntent.putExtra("minimizer_type",minimizer_type);
-                dskIntent.putExtra("filename",filename);
+                dskIntent.putExtra("parcel",parcel);
+//                dskIntent.putExtra("path",fullPath);
+//                dskIntent.putExtra("base_path", devicePath);
+//                dskIntent.putExtra("kmer", kmer);
+//                dskIntent.putExtra("memory",memory);
+//                dskIntent.putExtra("disk",disk);
+//                dskIntent.putExtra("repartition_type",repartition_type);
+//                dskIntent.putExtra("minimizer_type",minimizer_type);
+//                dskIntent.putExtra("filename",filename);
 
 
 

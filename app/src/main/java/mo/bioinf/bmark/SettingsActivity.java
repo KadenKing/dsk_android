@@ -46,15 +46,17 @@ public class SettingsActivity extends AppCompatActivity {
         final Spinner minimizer_spinner = (Spinner) findViewById(R.id.minimizer_spinner);
         final Spinner repartition_spinner = (Spinner) findViewById(R.id.repartition_spinner);
 
+        DSK_Parcel parcel = getIntent().getParcelableExtra("parcel");
+
 
 
         /*set the input fields to their current values*/
-        num_kmer.setText(String.valueOf(getIntent().getIntExtra("kmer",-1)));
-        num_disk.setText(String.valueOf(getIntent().getIntExtra("disk",-1)));
-        num_mem.setText(String.valueOf(getIntent().getIntExtra("memory",-1)));
+        num_kmer.setText(String.valueOf(parcel.getKmer()));
+        num_disk.setText(String.valueOf(parcel.getDisk()));
+        num_mem.setText(String.valueOf(parcel.getMemory()));
 
-        minimizer_spinner.setSelection(getIntent().getIntExtra("minimizer_type",-1));
-        repartition_spinner.setSelection(getIntent().getIntExtra("repartition_type",-1));
+        minimizer_spinner.setSelection(parcel.getMinimizer_type());
+        repartition_spinner.setSelection(parcel.getRepartition_type());
 
 
         done_button.setOnClickListener(new View.OnClickListener(){
@@ -65,12 +67,15 @@ public class SettingsActivity extends AppCompatActivity {
                 String minimizerStr = minimizer_spinner.getSelectedItem().toString();
                 String repartitionStr = repartition_spinner.getSelectedItem().toString();
 
+                DSK_Parcel returnParcel = new DSK_Parcel(kmer,memory,disk,repartition2int(repartitionStr),minimizer2int(minimizerStr));
+
                 Intent result = new Intent();
-                result.putExtra("kmer", kmer);
-                result.putExtra("disk", disk);
-                result.putExtra("memory", memory);
-                result.putExtra("minimizer_type", minimizer2int(minimizerStr));
-                result.putExtra("repartition_type",repartition2int(repartitionStr));
+//                result.putExtra("kmer", kmer);
+//                result.putExtra("disk", disk);
+//                result.putExtra("memory", memory);
+//                result.putExtra("minimizer_type", minimizer2int(minimizerStr));
+//                result.putExtra("repartition_type",repartition2int(repartitionStr));
+                result.putExtra("returnParcel",returnParcel);
                 setResult(Activity.RESULT_OK, result);
                 finish();
             }

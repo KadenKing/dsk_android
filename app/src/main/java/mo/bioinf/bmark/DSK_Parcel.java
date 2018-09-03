@@ -14,7 +14,7 @@ public class DSK_Parcel implements Parcelable{
     private int minimizer_type = 0;
     private String filename = "";
 
-    public DSK_Parcel(int kmer, int memory, int disk, int repartition_type, int minimizer_type{
+    public DSK_Parcel(int kmer, int memory, int disk, int repartition_type, int minimizer_type){
         this.kmer = kmer;
         this.memory = memory;
         this.disk = disk;
@@ -25,7 +25,7 @@ public class DSK_Parcel implements Parcelable{
         this.filename = filename;
     }
 
-    public String minimizer2string(int minimizer_type)
+    public String minimizer2string()
     {
         if(minimizer_type == 0)
             return "Lexicographic";
@@ -33,17 +33,17 @@ public class DSK_Parcel implements Parcelable{
             return "Frequency";
 
 
-        return "";
+        return "e";
     }
 
-    public String repartition2string(int repartition_type)
+    public String repartition2string()
     {
         if(repartition_type == 0)
             return "Unordered";
         if(repartition_type == 1)
             return "Ordered";
 
-        return "";
+        return "e";
     }
 
     public static final Creator<DSK_Parcel> CREATOR = new Creator<DSK_Parcel>() {

@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -30,38 +32,15 @@ import java.util.List;
 import java.util.Map;
 
 
+
+
+
 public class MainActivity extends AppCompatActivity {
 
-    private int kmer = 31;
-    private int memory = 2000;
-    private int disk = 20000;
-    private String devicePath = "";
-    private String fullPath = "";
-    private int repartition_type = 0;
-    private int minimizer_type = 0;
-    private String filename = "";
+    private DSK_Parcel parcel = new DSK_Parcel(31,2000, 20000, 0, 0);
 
 
-    private String minimizer2string(int minimizer_type)
-    {
-        if(minimizer_type == 0)
-            return "Lexicographic";
-        if(minimizer_type == 1)
-            return "Frequency";
 
-
-        return "";
-    }
-
-    private String repartition2string(int repartition_type)
-    {
-        if(repartition_type == 0)
-            return "Unordered";
-        if(repartition_type == 1)
-            return "Ordered";
-
-        return "";
-    }
 
 
     void updateTV(TextView tv, int kmer, int memory, int disk, String path, int repartition_type, int minimizer_type){

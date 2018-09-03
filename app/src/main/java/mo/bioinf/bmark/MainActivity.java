@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private String fullPath = "";
     private int repartition_type = 0;
     private int minimizer_type = 0;
+    private String filename = "";
 
 
     private String minimizer2string(int minimizer_type)
@@ -138,6 +139,7 @@ public class MainActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
             {
                 String selectedItem = parent.getItemAtPosition(position).toString();
+                filename = selectedItem;
                 fullPath = base_path  + selectedItem;
                 updateTV(tv,kmer,memory,disk,fullPath,repartition_type,minimizer_type);
 
@@ -196,6 +198,7 @@ public class MainActivity extends AppCompatActivity {
                 dskIntent.putExtra("disk",disk);
                 dskIntent.putExtra("repartition_type",repartition_type);
                 dskIntent.putExtra("minimizer_type",minimizer_type);
+                dskIntent.putExtra("filename",filename);
 
 
 

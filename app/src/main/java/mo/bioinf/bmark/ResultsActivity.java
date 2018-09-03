@@ -29,10 +29,11 @@ public class ResultsActivity extends AppCompatActivity {
 
         //set results text
         String results = getIntent().getStringExtra("runtime");
+        String filename = getIntent().getStringExtra("filename");
         tv.setText(results);
 
         final String base_path = context.getFilesDir().getAbsolutePath().toString();
-        File histo = new File(base_path + "/../files.histo");
+        File histo = new File(base_path + "/" + filename + ".histo");
 //        if(histo.exists() && histo.canRead())
 //        {
             try{

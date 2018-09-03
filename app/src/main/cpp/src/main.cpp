@@ -57,11 +57,12 @@ using namespace std;
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_mo_bioinf_bmark_DSKRunning_stringFromJNI(JNIEnv *env, jobject instance, jstring path, jstring base_path, jint kmer, jint memory, jint disk, jint repartition_type, jint minimizer_type) {
+Java_mo_bioinf_bmark_DSKRunning_stringFromJNI(JNIEnv *env, jobject instance, jstring path, jstring base_path,jstring filename, jint kmer, jint memory, jint disk, jint repartition_type, jint minimizer_type) {
     const char *str = (*env).GetStringUTFChars(path,0);
     std::string javaPath = str;
     const char *bstr = (*env).GetStringUTFChars(base_path,0);
     std::string javaBasePath = bstr;
+    std::string outpath = javaBasePath.append("/").append((*env).GetStringUTFChars(filename,0));
     string strK, strM, strD, strRepartition, strMinimizer;
     strK = to_string(kmer);
     strM = to_string(memory);
@@ -78,7 +79,7 @@ Java_mo_bioinf_bmark_DSKRunning_stringFromJNI(JNIEnv *env, jobject instance, jst
     __android_log_print(ANDROID_LOG_INFO,"repartition",&strRepartition[0u]);
     __android_log_print(ANDROID_LOG_INFO,"minimizer",&strMinimizer[0u]);
 
-    char *argv[] = {"./dsk", "-file", &javaPath[0u], "-kmer-size",  &strK[0u],"-out", &javaBasePath[0u],
+    char *argv[] = {"./dsk", "-file", &javaPath[0u], "-kmer-size",  &strK[0u],"-out", &outpath[0u],
                     "-out-tmp", &javaBasePath[0u], "-out-dir", &javaBasePath[0u], "-max-memory", &strM[0u],
                     "-max-disk", &strD[0u], "-minimizer-type", &strRepartition[0u], "-minimizer-type", &strMinimizer[0u]};
     //char *argv[] = {"./dsk", "-file", &javaPath[0u]};

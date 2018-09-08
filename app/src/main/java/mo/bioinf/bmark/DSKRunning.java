@@ -27,34 +27,30 @@ public class DSKRunning extends AppCompatActivity {
         final DSK_Parcel parcel = getIntent().getParcelableExtra("parcel");
 
 
-//        final String path = getIntent().getStringExtra("path");
-//        final String base_path = getIntent().getStringExtra("base_path");
-//        final String filename = getIntent().getStringExtra("filename");
-//        final int kmer = getIntent().getIntExtra("kmer",-1);
-//        final int memory = getIntent().getIntExtra("memory",-1);
-//        final int disk = getIntent().getIntExtra("disk",-1);
-//        final int repartition_type = getIntent().getIntExtra("repartition_type",-1);
-//        final int minimizer_type = getIntent().getIntExtra("minimizer_type",-1);
-
         final Runnable DSK = new Runnable(){
             @Override
             public void run(){
+                /*** sending the actual parsel to the jni is a nightmare so for now we're sending it piece by piece ***/
                 String runtime = stringFromJNI(parcel.getFullPath(),parcel.getDevicePath(), parcel.getFilename(), parcel.getKmer(),
                                                 parcel.getMemory(),parcel.getDisk(),parcel.getRepartition_type(),parcel.getMinimizer_type());
+                /******************************************************************************************************/
 
+                /*** send the runtime and the filename to the results activity to show the results ***/
                 Intent results_intent = new Intent(getBaseContext(),ResultsActivity.class);
                 results_intent.putExtra("runtime", runtime);
                 results_intent.putExtra("filename", parcel.getFilename());
                 DSKRunning.this.startActivity(results_intent);
+                /*************************************************************************************/
 
 
                 finish();
             }
         };
 
+        /*** the java ui thread needs a chance to start before we run DSK ***/
         final Handler dskHandler = new Handler();
         dskHandler.postDelayed(DSK,2000);
-
+        /*********************************************************************/
 
 
     }

@@ -82,12 +82,6 @@ public class MainActivity extends AppCompatActivity {
             parcel = returnParcel;
 
 
-//            parcel.setKmer(data.getIntExtra("kmer",0));
-//            parcel.setMemory(data.getIntExtra("memory",0));
-//            parcel.setDisk(data.getIntExtra("disk",0));
-//            parcel.setMinimizer_type(data.getIntExtra("minimizer_type", -2));
-//            parcel.setRepartition_type(data.getIntExtra("repartition_type", -2));
-
             final TextView tv = (TextView) findViewById(R.id.sample_text);
             updateTV(tv, parcel.getKmer(),parcel.getMemory(), parcel.getDisk(),parcel.getFullPath(),
                     parcel.getRepartition_type(), parcel.getMinimizer_type());
@@ -103,11 +97,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         final Context context = this;
 
+        /*** instances of ui widgets ***/
         final TextView tv = (TextView) findViewById(R.id.sample_text);
         final Button run = (Button) findViewById(R.id.run_button);
         final Spinner dropdown = (Spinner) findViewById(R.id.fastq_files);
         final ImageButton settings_button = (ImageButton) findViewById(R.id.settings_button);
-        run.setEnabled(false);
+        /*******************************/
+
+
+        run.setEnabled(false); // enabled later when the file path is verified
 
         final String base_path = context.getFilesDir().getAbsolutePath().toString() + "/fastq/"; // this phone's working directory
         parcel.setDevicePath(context.getFilesDir().getAbsolutePath().toString());
@@ -148,28 +146,12 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
-
-
-        /*making a view flipper so that we can have a loading animation*/
-        final ViewFlipper flipper = (ViewFlipper) findViewById(R.id.flipper);
-
-
-
-
-
-
         settings_button.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
 
                 Intent myIntent = new Intent(getBaseContext(), SettingsActivity.class);
                 myIntent.putExtra("parcel",parcel);
-                //send current parameters to fill to pre-fill the form
-//                myIntent.putExtra("kmer",kmer);
-//                myIntent.putExtra("memory",memory);
-//                myIntent.putExtra("disk",disk);
-//                myIntent.putExtra("minimizer_type",minimizer_type);
-//                myIntent.putExtra("repartition_type",repartition_type);
+
                 MainActivity.this.startActivityForResult(myIntent,1);
 
 
@@ -181,23 +163,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v){
                 Intent dskIntent = new Intent(getBaseContext(),DSKRunning.class);
                 dskIntent.putExtra("parcel",parcel);
-//                dskIntent.putExtra("path",fullPath);
-//                dskIntent.putExtra("base_path", devicePath);
-//                dskIntent.putExtra("kmer", kmer);
-//                dskIntent.putExtra("memory",memory);
-//                dskIntent.putExtra("disk",disk);
-//                dskIntent.putExtra("repartition_type",repartition_type);
-//                dskIntent.putExtra("minimizer_type",minimizer_type);
-//                dskIntent.putExtra("filename",filename);
-
-
 
                 MainActivity.this.startActivity(dskIntent);
-
-
-                //flipper.showNext();
-
-
 
 
             }

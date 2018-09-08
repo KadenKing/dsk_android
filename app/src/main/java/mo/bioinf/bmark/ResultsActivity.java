@@ -32,28 +32,26 @@ public class ResultsActivity extends AppCompatActivity {
         String filename = getIntent().getStringExtra("filename");
         tv.setText(results);
 
+
+
+        /*** determines what the name of the histogram should be, opens it, and reads it into the view ***/
         final String base_path = context.getFilesDir().getAbsolutePath().toString();
         File histo = new File(base_path + "/" + filename + ".histo");
-//        if(histo.exists() && histo.canRead())
-//        {
-            try{
-                Scanner scanner = new Scanner(histo);
 
-                while(scanner.hasNextLine())
-                {
-                    results_view.append(scanner.nextLine() + "\n");
-                }
+        try{
+            Scanner scanner = new Scanner(histo);
 
-
-            }catch(java.io.FileNotFoundException e)
+            while(scanner.hasNextLine())
             {
-                results_view.setText("exception");
+                results_view.append(scanner.nextLine() + "\n");
             }
-//
-//        }else{
-//            results_view.setText("could not open");
-//        }
 
+
+        }catch(java.io.FileNotFoundException e)
+        {
+            results_view.setText("exception");
+        }
+        /****************************************************************************************************/
 
         done_button.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){

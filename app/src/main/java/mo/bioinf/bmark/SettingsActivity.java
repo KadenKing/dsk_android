@@ -39,25 +39,27 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
+        /*** input widget instances ****/
         final EditText num_disk = (EditText) findViewById(R.id.num_disk);
         final EditText num_kmer = (EditText) findViewById(R.id.num_kmer);
         final EditText num_mem = (EditText) findViewById(R.id.num_memory);
         final Button done_button = (Button) findViewById(R.id.done_button);
         final Spinner minimizer_spinner = (Spinner) findViewById(R.id.minimizer_spinner);
         final Spinner repartition_spinner = (Spinner) findViewById(R.id.repartition_spinner);
+        /*******************************/
+
 
         DSK_Parcel parcel = getIntent().getParcelableExtra("parcel");
 
 
 
-        /*set the input fields to their current values*/
+        /*** set the input fields to their current values ***/
         num_kmer.setText(String.valueOf(parcel.getKmer()));
         num_disk.setText(String.valueOf(parcel.getDisk()));
         num_mem.setText(String.valueOf(parcel.getMemory()));
-
         minimizer_spinner.setSelection(parcel.getMinimizer_type());
         repartition_spinner.setSelection(parcel.getRepartition_type());
-
+        /****************************************************/
 
         done_button.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
@@ -70,11 +72,7 @@ public class SettingsActivity extends AppCompatActivity {
                 DSK_Parcel returnParcel = new DSK_Parcel(kmer,memory,disk,repartition2int(repartitionStr),minimizer2int(minimizerStr));
 
                 Intent result = new Intent();
-//                result.putExtra("kmer", kmer);
-//                result.putExtra("disk", disk);
-//                result.putExtra("memory", memory);
-//                result.putExtra("minimizer_type", minimizer2int(minimizerStr));
-//                result.putExtra("repartition_type",repartition2int(repartitionStr));
+
                 result.putExtra("returnParcel",returnParcel);
                 setResult(Activity.RESULT_OK, result);
                 finish();

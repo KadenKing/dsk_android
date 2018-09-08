@@ -58,10 +58,16 @@ using namespace std;
 extern "C"
 JNIEXPORT jstring JNICALL
 Java_mo_bioinf_bmark_DSKRunning_stringFromJNI(JNIEnv *env, jobject instance, jstring path, jstring base_path,jstring filename, jint kmer, jint memory, jint disk, jint repartition_type, jint minimizer_type) {
+
+    /***converting jstrings to c++ strings*****/
     const char *str = (*env).GetStringUTFChars(path,0);
     std::string javaPath = str;
     const char *bstr = (*env).GetStringUTFChars(base_path,0);
     std::string javaBasePath = bstr;
+    /*******************************************/
+
+
+    /****convert all inputs to strings so they can be put into a char pointer array *****/
     std::string outpath = javaBasePath.append("/").append((*env).GetStringUTFChars(filename,0));
     string strK, strM, strD, strRepartition, strMinimizer;
     strK = to_string(kmer);
@@ -69,8 +75,10 @@ Java_mo_bioinf_bmark_DSKRunning_stringFromJNI(JNIEnv *env, jobject instance, jst
     strD = to_string(disk);
     strRepartition = to_string(repartition_type);
     strMinimizer = to_string(minimizer_type);
+    /**************************************************************************************/
 
 
+    /***** debug logs *******/
     __android_log_print(ANDROID_LOG_INFO,"file",javaPath.c_str());
     __android_log_print(ANDROID_LOG_INFO,"base_path",&javaBasePath[0u]);
     __android_log_print(ANDROID_LOG_INFO,"kmer",&strK[0u]);
@@ -78,41 +86,44 @@ Java_mo_bioinf_bmark_DSKRunning_stringFromJNI(JNIEnv *env, jobject instance, jst
     __android_log_print(ANDROID_LOG_INFO,"disk",&strD[0u]);
     __android_log_print(ANDROID_LOG_INFO,"repartition",&strRepartition[0u]);
     __android_log_print(ANDROID_LOG_INFO,"minimizer",&strMinimizer[0u]);
+    /**********************/
 
+    /**** create a arguments array that will be parsed by gatb's argument parser.i'll probably change this later  ****/
     char *argv[] = {"./dsk", "-file", &javaPath[0u], "-kmer-size",  &strK[0u],"-out", &outpath[0u],
                     "-out-tmp", &javaBasePath[0u], "-out-dir", &javaBasePath[0u], "-max-memory", &strM[0u],
                     "-max-disk", &strD[0u], "-minimizer-type", &strRepartition[0u], "-minimizer-type", &strMinimizer[0u]};
-    //char *argv[] = {"./dsk", "-file", &javaPath[0u]};
+    /******************************************************************************************************************/
 
 
-    //makeArgv(javaPath,kmer,memory,disk,argv);
 
     string strDuration;
     try{
+        /**** runs dsk with the arguments, and keeps track of how long it takes ****/
         chrono::high_resolution_clock::time_point t1 = chrono::high_resolution_clock::now();
         DSK().run(19,argv);
         chrono::high_resolution_clock::time_point t2 = chrono::high_resolution_clock::now();
         auto duration = chrono::duration_cast<chrono::seconds>( t2 - t1 ).count();
         strDuration = to_string(duration);
+        /**************************************************************************/
 
     }catch(OptionFailure& e)
     {
 
         __android_log_print(ANDROID_LOG_INFO,"Exception", "caught");
     }
+
+
+
+
+
     const char *charDuration = strDuration.c_str();
 
-    //std::string hello = "Howdy from DSK";
-    __android_log_print(ANDROID_LOG_INFO,"test",str);
     __android_log_print(ANDROID_LOG_INFO,"finish", "finished");
 
     string answer = "This fastq took ";
     answer.append(strDuration);
     answer.append(" seconds.");
 
-
-
-    //std::string hello = "Howdy from DSK";
     return env->NewStringUTF(answer.c_str());
 }
 

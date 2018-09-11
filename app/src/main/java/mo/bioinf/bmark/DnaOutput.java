@@ -1,6 +1,63 @@
 package mo.bioinf.bmark;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
 public class DnaOutput {
+
+    private List<String> DNA_sequences = new ArrayList<String>();
+
+    public void printDNA(){
+
+        if(DNA_sequences.size() == 0)
+        {
+            System.out.println("sequences empty");
+        }
+
+        for(String sequence : DNA_sequences){
+            System.out.println(sequence);
+        }
+    }
+
+    public DnaOutput(File input) throws java.io.FileNotFoundException{
+
+        if(input.exists() && input.canRead()) {
+
+            System.out.println("exists and can read");
+
+            FileReader filereader = new FileReader(input);
+            BufferedReader bufferedreader = new BufferedReader(filereader);
+            StringBuffer stringbuffer = new StringBuffer();
+
+            String currentLine;
+            try{
+                while((currentLine = bufferedreader.readLine()) != null){
+                    stringbuffer.append(currentLine);
+                    System.out.println(stringbuffer.toString());
+                }
+                filereader.close();
+            }catch(java.io.IOException e){
+                System.out.println(e.getMessage());
+            }
+
+
+
+
+
+
+
+        }
+
+    }
+
+    public DnaOutput(){
+
+    }
+
 
 
     public static String binary2dna(String input, int kmersize)

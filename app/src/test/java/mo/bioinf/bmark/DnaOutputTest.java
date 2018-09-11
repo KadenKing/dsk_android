@@ -2,6 +2,8 @@ package mo.bioinf.bmark;
 
 import org.junit.Test;
 
+import java.io.File;
+
 import static org.junit.Assert.*;
 
 /**
@@ -11,6 +13,21 @@ import static org.junit.Assert.*;
  */
 
 public class DnaOutputTest {
+
+    @Test
+    public void readfiletest()
+    {
+        File file = new File("/home/kaden/Documents/dsk/build/bin/ERR1539057_gatb/dsk.solid.0");
+        try{
+
+            DnaOutput test = new DnaOutput(file);
+            test.printDNA();
+        }catch (java.io.FileNotFoundException e)
+        {
+            System.out.println(e.getMessage());
+        }
+
+    }
 
     @Test
     public void hex2stringtext()

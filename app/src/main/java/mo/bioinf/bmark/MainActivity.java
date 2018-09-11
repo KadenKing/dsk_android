@@ -92,7 +92,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.println(Log.ASSERT, "hey", "hello");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         final Context context = this;
@@ -145,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
+        /*** open settings activity ***/
         settings_button.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
 
@@ -158,7 +157,9 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+        /***********************************/
 
+        /*** run DSK ***/
         run.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
                 Intent dskIntent = new Intent(getBaseContext(),DSKRunning.class);
@@ -169,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
+        /****************/
 
 
     }

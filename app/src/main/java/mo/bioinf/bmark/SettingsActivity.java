@@ -61,6 +61,8 @@ public class SettingsActivity extends AppCompatActivity {
         repartition_spinner.setSelection(parcel.getRepartition_type());
         /****************************************************/
 
+
+        /*** send settings information back to MainActivity ***/
         done_button.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
                 int kmer = Integer.parseInt(num_kmer.getText().toString());
@@ -78,6 +80,7 @@ public class SettingsActivity extends AppCompatActivity {
                 finish();
             }
         });
+        /************************************************************/
 
     }
 

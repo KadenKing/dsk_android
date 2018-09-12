@@ -59,7 +59,7 @@ public class DnaOutputTest {
     {
         DnaOutput test = new DnaOutput();
 
-        assertEquals("03300002", test.extend("3300002"));
+        assertEquals("03300002", test.extend("3300002", 8));
     }
 
     @Test

@@ -2,6 +2,7 @@ package mo.bioinf.bmark;
 
 import android.content.SyncStatusObserver;
 import android.os.Parcelable;
+import android.util.Pair;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -9,12 +10,19 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 public class DnaOutput {
 
     private List<String> DNA_sequences = new ArrayList<String>();
+
+    Map<String,String> hex_map = new HashMap<>();
+    Map<String, String> dna_map = new HashMap<>();
+
 
     public void printDNA(){
 
@@ -54,6 +62,92 @@ public class DnaOutput {
 
     }
 
+    private String unNegative(String input)
+    {
+        return input.substring(6,input.length());
+    }
+
+    private List<String> create_blocks_of_4(List<String> input){
+        List<String> ans = new ArrayList<>();
+        String currentStr = "";
+        for(int i = 1; i <= input.size(); i++)
+        {
+            currentStr += input.get(i-1);
+            if(i%2 == 0)
+            {
+                ans.add(currentStr);
+                currentStr = "";
+            }
+        }
+
+        return ans;
+    }
+
+    private List<String> toStringBytes(byte[] input){
+
+        List<String> ans = new ArrayList<>();
+
+        for(int i = 0; i < input.length; i++){
+            int temp = input[i];
+            String hex = Integer.toHexString(temp);
+            //int parsed = (int) Long.parseLong(hex,16);
+
+            if(hex.length() > 2){
+                //System.out.println(unNegative(hex));
+                ans.add(unNegative(hex));
+            }else{
+                //System.out.println(extend(hex,2));
+                ans.add(extend(hex,2));
+            }
+
+        }
+
+        return ans;
+
+    }
+
+    private void pair_hex_to_abundances(List<String> input){
+
+        String currentDnaHex = "";
+        String currentAbundanceHex = "";
+        for(int i = 1; i <= input.size(); i++)
+        {
+            int place_in_line = i%8;
+
+            if(place_in_line <= 4 && place_in_line != 0)
+            {
+                currentDnaHex += input.get(i-1) + " ";
+
+
+
+            }else{
+                currentAbundanceHex += input.get(i-1) + " ";
+            }
+
+            if(place_in_line == 0) // finish a line
+            {
+               this.hex_map.put(currentDnaHex,currentAbundanceHex);
+
+                currentDnaHex = "";
+                currentAbundanceHex = "";
+            }
+
+
+        }
+
+
+    }
+
+    private String transformed_hex_to_dec(String input)
+    {
+
+
+
+
+
+        return "";
+    }
+
     public DnaOutput(File input) throws java.io.FileNotFoundException{
 
         if(input.exists() && input.canRead()) {
@@ -62,13 +156,23 @@ public class DnaOutput {
 
 
             byte[] bytes = readBytes(input);
+            List<String> stringBytes = toStringBytes(bytes);
 
-           for(int i = 0; i < bytes.length; i++){
-               int temp = bytes[i];
-               String hex = Integer.toHexString(temp);
-               //int parsed = (int) Long.parseLong(hex,16);
-               System.out.println(hex);
-           }
+           List<String> blocks = create_blocks_of_4(stringBytes); // put into groups of 4 nibbles to make it look like hex view
+
+         pair_hex_to_abundances(blocks);
+
+
+
+
+
+
+        for(Map.Entry<String,String> entry : this.hex_map.entrySet())
+        {
+            System.out.println("DNA: " + entry.getKey() + " - Abundance: " + entry.getValue());
+        }
+
+
 
 
 
@@ -98,7 +202,7 @@ public class DnaOutput {
 
         String[] base4 = {hex2base4(hex[0]),hex2base4(hex[1]),hex2base4(hex[2]),hex2base4(hex[3])};
 
-        String[] extended = {extend(base4[0]),extend(base4[1]),extend(base4[2]),extend(base4[3])};
+        String[] extended = {extend(base4[0],8),extend(base4[1],8),extend(base4[2],8),extend(base4[3],8)};
 
         String[] DNA = {base42dna(extended[0]),base42dna(extended[1]),base42dna(extended[2]),base42dna(extended[3])};
 
@@ -138,10 +242,10 @@ public class DnaOutput {
 
     }
 
-    public static String extend(String input){
+    public static String extend(String input, int goalSize){
         int length = input.length();
 
-        int difference = 8 - length;
+        int difference = goalSize - length;
 
         String substr = "";
         for(int i = 0; i < difference; i++)

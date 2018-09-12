@@ -1,8 +1,13 @@
 package mo.bioinf.bmark;
 
+import android.content.SyncStatusObserver;
+import android.os.Parcelable;
+
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -23,27 +28,47 @@ public class DnaOutput {
         }
     }
 
+    private byte[] readBytes(File input){
+        byte[] ans;
+        try{
+
+            long filesize = input.length();
+            InputStream inputstream = new FileInputStream(input);
+            byte[] allBytes = new byte[(int) filesize];
+
+
+
+            inputstream.read(allBytes);
+
+
+            inputstream.close();
+
+            return allBytes;
+
+        }catch(java.io.IOException e){
+            System.out.println(e.getMessage());
+        }
+
+        return null;
+
+
+    }
+
     public DnaOutput(File input) throws java.io.FileNotFoundException{
 
         if(input.exists() && input.canRead()) {
 
             System.out.println("exists and can read");
 
-            FileReader filereader = new FileReader(input);
-            BufferedReader bufferedreader = new BufferedReader(filereader);
-            StringBuffer stringbuffer = new StringBuffer();
 
-            String currentLine;
-            try{
-                while((currentLine = bufferedreader.readLine()) != null){
-                    stringbuffer.append(currentLine);
-                    System.out.println(stringbuffer.toString());
-                }
-                filereader.close();
-            }catch(java.io.IOException e){
-                System.out.println(e.getMessage());
-            }
+            byte[] bytes = readBytes(input);
 
+           for(int i = 0; i < bytes.length; i++){
+               int temp = bytes[i];
+               String hex = Integer.toHexString(temp);
+               //int parsed = (int) Long.parseLong(hex,16);
+               System.out.println(hex);
+           }
 
 
 

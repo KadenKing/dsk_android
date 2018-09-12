@@ -5,9 +5,11 @@ import android.os.Parcelable;
 import android.util.Pair;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -140,12 +142,50 @@ public class DnaOutput {
 
     private String transformed_hex_to_dec(String input)
     {
+        String[] split = input.split(" ");
+
+        String[] transformed = {transform(split[3]), transform(split[2]),transform(split[1]),transform(split[0])};
+
+        String combined = "";
+
+        for(int i = 0; i < 4; i++)
+        {
+            combined += transformed[i];
+        }
+        //System.out.println(combined);
+        return String.valueOf(Integer.parseInt(combined,16));
+
+    }
+
+    private void write_to_file()
+    {
+        String path = "/home/kaden/Documents/dsk/build/bin/output2.txt";
+
+        File file = new File(path);
+
+        try{
+
+            BufferedWriter writer = new BufferedWriter(new FileWriter(path));
+
+            for(Map.Entry<String,String> entry : this.dna_map.entrySet())
+            {
+                writer.write(entry.getKey() + " " + entry.getValue() + "\n");
+                //System.out.println("wrote");
+            }
+
+            writer.close();
+
+        }catch(java.io.IOException e)
+        {
+            System.out.println(e.getMessage());
+        }
 
 
 
 
 
-        return "";
+
+
     }
 
     public DnaOutput(File input) throws java.io.FileNotFoundException{
@@ -169,11 +209,18 @@ public class DnaOutput {
 
         for(Map.Entry<String,String> entry : this.hex_map.entrySet())
         {
-            System.out.println("DNA: " + entry.getKey() + " - Abundance: " + entry.getValue());
+            //System.out.println("DNA: " + binary2dna(entry.getKey(),31) + " - Abundance: " + transformed_hex_to_dec(entry.getValue()));
+            dna_map.put(binary2dna(entry.getKey(),31),transformed_hex_to_dec(entry.getValue()));
         }
 
 
+        for(Map.Entry<String,String> entry : this.dna_map.entrySet())
+        {
+            System.out.println("DNA: " + entry.getKey() + " - Abundance: " + entry.getValue());
+            //dna_map.put(binary2dna(entry.getKey(),31),transformed_hex_to_dec(entry.getValue()));
+        }
 
+        write_to_file();
 
 
 

@@ -153,7 +153,7 @@ public class DnaOutput {
             combined += transformed[i];
         }
         //System.out.println(combined);
-        return String.valueOf(Integer.parseInt(combined,16));
+        return String.valueOf((Long.parseLong(combined,16)));
 
     }
 
@@ -195,12 +195,11 @@ public class DnaOutput {
             System.out.println("exists and can read");
 
 
-            byte[] bytes = readBytes(input);
-            List<String> stringBytes = toStringBytes(bytes);
+        byte[] bytes = readBytes(input);
+        List<String> stringBytes = toStringBytes(bytes);
 
-           List<String> blocks = create_blocks_of_4(stringBytes); // put into groups of 4 nibbles to make it look like hex view
-
-         pair_hex_to_abundances(blocks);
+        List<String> blocks = create_blocks_of_4(stringBytes); // put into groups of 4 nibbles to make it look like hex view
+        pair_hex_to_abundances(blocks);
 
 
 
@@ -214,11 +213,11 @@ public class DnaOutput {
         }
 
 
-        for(Map.Entry<String,String> entry : this.dna_map.entrySet())
-        {
-            System.out.println("DNA: " + entry.getKey() + " - Abundance: " + entry.getValue());
-            //dna_map.put(binary2dna(entry.getKey(),31),transformed_hex_to_dec(entry.getValue()));
-        }
+//        for(Map.Entry<String,String> entry : this.dna_map.entrySet())
+//        {
+//            System.out.println("DNA: " + entry.getKey() + " - Abundance: " + entry.getValue());
+//            //dna_map.put(binary2dna(entry.getKey(),31),transformed_hex_to_dec(entry.getValue()));
+//        }
 
         write_to_file();
 

@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import java.io.File;
+import java.util.Map;
 import java.util.Scanner;
 
 public class ResultsActivity extends AppCompatActivity {
@@ -24,55 +25,50 @@ public class ResultsActivity extends AppCompatActivity {
         final Context context = this;
 
         final Button done_button = (Button) findViewById(R.id.finished_button);
+        final Button read_dna_button = (Button) findViewById(R.id.dna_button);
         final TextView tv = (TextView) findViewById(R.id.time_text);
         final TextView results_view = (TextView) findViewById(R.id.histogram);
 
         //set results text
-        String results = getIntent().getStringExtra("runtime");
-        String filename = getIntent().getStringExtra("filename");
+        final String results = getIntent().getStringExtra("runtime");
+        final String filename = getIntent().getStringExtra("filename");
         tv.setText(results);
 
-        final String base_path = context.getFilesDir().getAbsolutePath().toString() + "/";
-        /*** making dna output ***/
-
-        try{
-            DnaOutput dna_output = new DnaOutput(filename, base_path);
 
 
 
-        }catch(java.io.FileNotFoundException e){
-            System.out.println(e.getMessage());
-        }
+        read_dna_button.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+                final String base_path = context.getFilesDir().getAbsolutePath().toString() + "/";
+                /*** making dna output ***/
+                DnaOutput dna_output = null;
+                try{
+                    dna_output = new DnaOutput(filename, base_path);
 
 
 
-
-        /************************/
-
-
-
-        /*** determines what the name of the histogram should be, opens it, and reads it into the view ***/
-        //final String base_path = context.getFilesDir().getAbsolutePath().toString();
+                }catch(java.io.FileNotFoundException e){
+                    System.out.println(e.getMessage());
+                }
 
 
 
 
-        File histo = new File(base_path + filename + "_dna.txt");
+                /************************/
 
-        try{
-            Scanner scanner = new Scanner(histo);
 
-            while(scanner.hasNextLine())
-            {
-                results_view.append(scanner.nextLine() + "\n");
+
+                /*** determines what the name of the histogram should be, opens it, and reads it into the view ***/
+
+                Map<String,String> dna_map = dna_output.getDna_map();
+
+                for(Map.Entry<String,String> entry : dna_map.entrySet())
+                {
+                    results_view.append(entry.getKey() + " " + entry.getValue() + "\n");
+                }
+                /****************************************************************************************************/
             }
-
-
-        }catch(java.io.FileNotFoundException e)
-        {
-            results_view.setText("exception");
-        }
-        /****************************************************************************************************/
+        });
 
         done_button.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){

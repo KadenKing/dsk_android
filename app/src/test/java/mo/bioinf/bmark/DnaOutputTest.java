@@ -18,53 +18,56 @@ import static org.junit.Assert.*;
 public class DnaOutputTest {
 
 
-//    @Test
-//    public void accuracyTest()
-//    {
-//        File file = new File("/home/kaden/Documents/dsk/build/bin/ERR1539057_gatb/allsolids");
-//        File dsk2ascii_output = new File("/home/kaden/Documents/dsk/build/bin/output.txt");
-//
-//        Map<String,String> originalMap = new HashMap<>();
-//
-//        DnaOutput test = null;
-//        Scanner original = null;
-//        try{
-//            test = new DnaOutput(file);
-//            original = new Scanner(dsk2ascii_output);
-//        }catch(java.io.FileNotFoundException e){
-//            System.out.println(e.getMessage());
-//        }
-//
-//        while(original.hasNextLine())
-//        {
-//            String[] dna_and_abundance = original.nextLine().split(" ");
-//            //System.out.println(dna_and_abundance[0]+ " - " + dna_and_abundance[1]);
-//            originalMap.put(dna_and_abundance[0].trim(),dna_and_abundance[1].trim());
-//            //System.out.println(dna_and_abundance[0].trim());
-//
-//        }
-//        original.close();
-//
-//
-//
-//        int count = 0;
-//        for(Map.Entry<String,String> entry : test.dna_map.entrySet())
-//        {
-//
-//            System.out.println("DNA: " + entry.getKey() + " - Abundance: " + entry.getValue());
-//            count++;
-//        }
-//
-//
-//
-//
-//
-//    }
+    @Test
+    public void accuracyTest()
+    {
+        System.out.println("hey");
+        File file = new File("/home/kaden/Documents/dsk/build/bin/ERR1539057_gatb/dsk.solid.2");
+        File dsk2ascii_output = new File("/home/kaden/Documents/dsk/build/bin/output.txt");
+
+        Map<String,String> originalMap = new HashMap<>();
+
+        DnaOutput test = null;
+        Scanner original = null;
+        try{
+            test = new DnaOutput(file);
+            original = new Scanner(dsk2ascii_output);
+        }catch(java.io.FileNotFoundException e){
+            System.out.println(e.getMessage());
+        }
+
+        while(original.hasNextLine())
+        {
+            String[] dna_and_abundance = original.nextLine().split(" ");
+            //System.out.println(dna_and_abundance[0]+ " - " + dna_and_abundance[1]);
+            originalMap.put(dna_and_abundance[0].trim(),dna_and_abundance[1].trim());
+            //System.out.println(dna_and_abundance[0].trim());
+
+        }
+        original.close();
+
+
+
+        int count = 0;
+        for(Map.Entry<String,String> entry : test.dna_map.entrySet())
+        {
+            boolean condition = entry.getValue().equals(originalMap.get(entry.getKey()));
+            //ystem.out.println(entry.getKey());
+            assertEquals(true,condition);
+            //System.out.println("DNA: " + entry.getKey() + " - Abundance: " + entry.getValue());
+            count++;
+        }
+
+
+        System.out.println("hey2");
+
+
+    }
 
     @Test
     public void readfiletest()
     {
-        File file = new File("/home/kaden/Documents/dsk/build/bin/ERR1539057_gatb/dsk.solid.0");
+        File file = new File("/home/kaden/Documents/dsk/build/bin/ERR1539057_gatb/allsolids");
         try{
 
             DnaOutput test = new DnaOutput(file);

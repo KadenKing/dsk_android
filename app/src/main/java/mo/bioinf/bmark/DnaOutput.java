@@ -32,6 +32,15 @@ public class DnaOutput {
     private String basepath = "";
 
 
+    /**
+     * For now, the constructor automatically converts each dsk.solid.* it can find into a single
+     * filename_dna.txt file.
+     *
+     *
+     * @param fastq_name
+     * @param basepath
+     * @throws java.io.FileNotFoundException
+     */
     public DnaOutput(String fastq_name, String basepath) throws java.io.FileNotFoundException{
 
         this.fastq_name = fastq_name;
@@ -72,6 +81,10 @@ public class DnaOutput {
 
     }
 
+    /**
+     * based on based path and filename, it finds all of the dsk solids.
+     * It puts them into a list of files that will later be read and parsed
+     */
     private void find_solids()
     {
         int count = 0;
@@ -94,6 +107,10 @@ public class DnaOutput {
 
     }
 
+
+    /**
+     * writes the dna_map file into a txt file.
+     */
     public void write_to_file()
     {
         String path = this.basepath + this.fastq_name + "_dna.txt";
@@ -128,7 +145,13 @@ public class DnaOutput {
     }
 
 
-
+    /**
+     * Reads the binary file and puts all its values into a byte array.
+     * This byte array is what is eventually manipulated into dna sequences and abundances
+     *
+     * @param input
+     * @return
+     */
     private byte[] readBytes(File input){
         byte[] ans;
         try{
@@ -155,11 +178,37 @@ public class DnaOutput {
 
     }
 
+    /**
+     * Java assumes all bytes read are in 2's complement, so if the binary form of any byte starts with a 1,
+     * Java treats it as a negative number. DSK wrote the binaries as unsigned binary numbers, so this needs to be undone.
+     *
+     * Java sign extends the bytes, so they are all strings of 8 length when this happens, so we can
+     * just remove the first 6 characters from the string to remove the sign extension.
+     *
+     * @param input
+     * @return
+     */
     private String unNegative(String input)
     {
         return input.substring(6,input.length());
     }
 
+
+    /**
+     * When reading the original binary files they are in the form:
+     * 023c c400 3203 0400 0200 0000 0000 0000
+     * 0404 0404 0404 0400 0200 0000 0000 0000
+     * a442 530f 2c94 0400 0400 0000 0000 0000
+     * c001 b4a1 0827 0500 0200 0000 0000 0000
+     * ...
+     *
+     * but java reads 1 byte at a time.
+     *
+     * This method puts them into chunks of 4 so that it is easier to understand what is going on later.
+     *
+     * @param input
+     * @return
+     */
     private List<String> create_blocks_of_4(List<String> input){
         List<String> ans = new ArrayList<>();
         String currentStr = "";
@@ -176,6 +225,14 @@ public class DnaOutput {
         return ans;
     }
 
+    /**
+     * Puts each byte into a list of strings.
+     * Also makes sure to remove any "negative" extended numbers from showing up.
+     * Ensures that every string is a 2 character string.
+     *
+     * @param input
+     * @return
+     */
     private List<String> toStringBytes(byte[] input){
 
         List<String> ans = new ArrayList<>();
@@ -199,6 +256,16 @@ public class DnaOutput {
 
     }
 
+    /**
+     * An example line that this method would read takes this form:
+     * 023c c400 3203 0400 0200 0000 0000 0000
+     *
+     * The first 4 chunks are the hexadecimal representation of the dna sequence, and the
+     * second 4 chunks are abundance.
+     *
+     * This method pairs the dna chunk to the abundance chunk for processing later
+     * @param input
+     */
     private void pair_hex_to_abundances(List<String> input){
 
         String currentDnaHex = "";
@@ -231,6 +298,11 @@ public class DnaOutput {
 
     }
 
+    /**
+     *
+     * @param input
+     * @return
+     */
     private String transformed_hex_to_dec(String input)
     {
         String[] split = input.split(" ");

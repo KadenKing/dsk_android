@@ -32,11 +32,32 @@ public class ResultsActivity extends AppCompatActivity {
         String filename = getIntent().getStringExtra("filename");
         tv.setText(results);
 
+        final String base_path = context.getFilesDir().getAbsolutePath().toString() + "/";
+        /*** making dna output ***/
+
+        try{
+            DnaOutput dna_output = new DnaOutput(filename, base_path);
+
+
+
+        }catch(java.io.FileNotFoundException e){
+            System.out.println(e.getMessage());
+        }
+
+
+
+
+        /************************/
+
 
 
         /*** determines what the name of the histogram should be, opens it, and reads it into the view ***/
-        final String base_path = context.getFilesDir().getAbsolutePath().toString();
-        File histo = new File(base_path + "/" + filename + ".histo");
+        //final String base_path = context.getFilesDir().getAbsolutePath().toString();
+
+
+
+
+        File histo = new File(base_path + filename + "_dna.txt");
 
         try{
             Scanner scanner = new Scanner(histo);

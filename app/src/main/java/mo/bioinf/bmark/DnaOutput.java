@@ -20,23 +20,114 @@ import java.util.Scanner;
 
 public class DnaOutput {
 
-    private List<String> DNA_sequences = new ArrayList<String>();
-
-    Map<String,String> hex_map = new HashMap<>();
-    Map<String, String> dna_map = new HashMap<>();
+    //private List<String> DNA_sequences = new ArrayList<String>();
 
 
-    public void printDNA(){
+    private List<File> solids = new ArrayList<>();
 
-        if(DNA_sequences.size() == 0)
+    private Map<String,String> hex_map = new HashMap<>();
+    private Map<String, String> dna_map = new HashMap<>();
+
+    private String fastq_name = "";
+    private String basepath = "";
+
+
+    public DnaOutput(String fastq_name, String basepath) throws java.io.FileNotFoundException{
+
+        this.fastq_name = fastq_name;
+        this.basepath = basepath;
+
+        find_solids();
+
+        for(File file : this.solids)
         {
-            System.out.println("sequences empty");
+            this.hex_map.clear(); // clears hashmap for new read
+
+
+            if(file.exists() && file.canRead()) {
+
+                System.out.println("exists and can read");
+
+
+                byte[] bytes = readBytes(file);
+                List<String> stringBytes = toStringBytes(bytes);
+
+                List<String> blocks = create_blocks_of_4(stringBytes); // put into groups of 4 nibbles to make it look like hex view
+                pair_hex_to_abundances(blocks);
+
+
+                for(Map.Entry<String,String> entry : this.hex_map.entrySet())
+                {
+                    //System.out.println("DNA: " + binary2dna(entry.getKey(),31) + " - Abundance: " + transformed_hex_to_dec(entry.getValue()));
+                    dna_map.put(binary2dna(entry.getKey(),31),transformed_hex_to_dec(entry.getValue()));
+                }
+
+
+            }
+
+
         }
 
-        for(String sequence : DNA_sequences){
-            System.out.println(sequence);
-        }
+        write_to_file();
+
     }
+
+    private void find_solids()
+    {
+        int count = 0;
+
+
+        while(true)
+        {
+            String path = this.basepath + this.fastq_name + "_gatb/dsk.solid." + count;
+            File file = new File(path);
+            if(file.exists() && file.canRead())
+            {
+                this.solids.add(file);
+                count++;
+            }else{
+                System.out.println("could not find " + path);
+                break;
+            }
+
+        }
+
+    }
+
+    public void write_to_file()
+    {
+        String path = this.basepath + this.fastq_name + "_dna.txt";
+
+        File file = new File(path);
+
+        try{
+
+            BufferedWriter writer = new BufferedWriter(new FileWriter(path));
+
+            for(Map.Entry<String,String> entry : this.dna_map.entrySet())
+            {
+                writer.write(entry.getKey() + " " + entry.getValue() + "\n");
+                //System.out.println("wrote");
+            }
+
+            writer.close();
+
+        }catch(java.io.IOException e)
+        {
+            System.out.println(e.getMessage());
+        }
+
+    }
+
+    public Map<String, String> getHex_map() {
+        return hex_map;
+    }
+
+    public Map<String, String> getDna_map() {
+        return dna_map;
+    }
+
+
 
     private byte[] readBytes(File input){
         byte[] ans;
@@ -157,77 +248,9 @@ public class DnaOutput {
 
     }
 
-    private void write_to_file()
-    {
-        String path = "/home/kaden/Documents/dsk/build/bin/output2.txt";
-
-        File file = new File(path);
-
-        try{
-
-            BufferedWriter writer = new BufferedWriter(new FileWriter(path));
-
-            for(Map.Entry<String,String> entry : this.dna_map.entrySet())
-            {
-                writer.write(entry.getKey() + " " + entry.getValue() + "\n");
-                //System.out.println("wrote");
-            }
-
-            writer.close();
-
-        }catch(java.io.IOException e)
-        {
-            System.out.println(e.getMessage());
-        }
 
 
 
-
-
-
-
-    }
-
-    public DnaOutput(File input) throws java.io.FileNotFoundException{
-
-        if(input.exists() && input.canRead()) {
-
-            System.out.println("exists and can read");
-
-
-        byte[] bytes = readBytes(input);
-        List<String> stringBytes = toStringBytes(bytes);
-
-        List<String> blocks = create_blocks_of_4(stringBytes); // put into groups of 4 nibbles to make it look like hex view
-        pair_hex_to_abundances(blocks);
-
-
-
-
-
-
-        for(Map.Entry<String,String> entry : this.hex_map.entrySet())
-        {
-            //System.out.println("DNA: " + binary2dna(entry.getKey(),31) + " - Abundance: " + transformed_hex_to_dec(entry.getValue()));
-            dna_map.put(binary2dna(entry.getKey(),31),transformed_hex_to_dec(entry.getValue()));
-        }
-
-
-//        for(Map.Entry<String,String> entry : this.dna_map.entrySet())
-//        {
-//            System.out.println("DNA: " + entry.getKey() + " - Abundance: " + entry.getValue());
-//            //dna_map.put(binary2dna(entry.getKey(),31),transformed_hex_to_dec(entry.getValue()));
-//        }
-
-        write_to_file();
-
-
-
-
-
-        }
-
-    }
 
     public DnaOutput(){
 

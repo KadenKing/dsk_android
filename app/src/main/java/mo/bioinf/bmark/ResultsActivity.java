@@ -2,6 +2,7 @@ package mo.bioinf.bmark;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.sax.StartElementListener;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -42,9 +43,13 @@ public class ResultsActivity extends AppCompatActivity {
                 final String base_path = context.getFilesDir().getAbsolutePath().toString() + "/";
                 /*** making dna output ***/
                 DnaOutput dna_output = null;
+                long runtime = 0;
                 try{
+                    long startTime = System.nanoTime();
                     dna_output = new DnaOutput(filename, base_path);
-
+                    long endTime = System.nanoTime();
+                    runtime = endTime - startTime;
+                    runtime /= 1000000;
 
 
                 }catch(java.io.FileNotFoundException e){
@@ -62,7 +67,7 @@ public class ResultsActivity extends AppCompatActivity {
 
                 Map<String,String> dna_map = dna_output.getDna_map();
 
-                results_view.append(dna_map.size() + " DNA sequences written");
+                results_view.append(dna_map.size() + " DNA sequences written \n Took " + runtime + " milliseconds");
 //
 //                for(Map.Entry<String,String> entry : dna_map.entrySet())
 //                {

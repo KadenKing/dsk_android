@@ -41,7 +41,7 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
-    private DSK_Parcel parcel = new DSK_Parcel(31,2000, 20000, 0, 0);
+    private DSK_Parcel parcel = new DSK_Parcel();
 
 
 

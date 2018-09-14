@@ -6,8 +6,8 @@ import android.os.Parcelable;
 public class DSK_Parcel implements Parcelable{
 
     private int kmer = 31;
-    private int memory = 2000;
-    private int disk = 20000;
+    private int memory = 5000;
+    private int disk = 50000;
     private String devicePath = "";
     private String fullPath = "";
     private int repartition_type = 0;
@@ -23,6 +23,10 @@ public class DSK_Parcel implements Parcelable{
         this.repartition_type = repartition_type;
         this.minimizer_type = minimizer_type;
         this.filename = filename;
+    }
+
+    public DSK_Parcel(){
+
     }
 
     public String minimizer2string()

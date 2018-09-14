@@ -299,6 +299,15 @@ public class DnaOutput {
     }
 
     /**
+     *This method converts the abundance hexadecimal into a decimal number.
+     *
+     * DSK outputs the binaries in an odd format that needs to be changed for it to be easier to work with.
+     *
+     * 0200 0000 0000 0000
+     *  ^               ^
+     *  |               |
+     *  least           most          significant digits
+     *
      *
      * @param input
      * @return
@@ -319,9 +328,6 @@ public class DnaOutput {
         return String.valueOf((Long.parseLong(combined,16)));
 
     }
-
-
-
 
 
     public DnaOutput(){

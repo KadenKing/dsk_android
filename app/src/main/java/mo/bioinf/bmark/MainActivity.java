@@ -27,6 +27,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +45,24 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    public void checkForSolids(String filename, String base_path){
+        final Button delete_button = (Button) findViewById(R.id.delete_button);
+
+        String pathStr = parcel.getDevicePath() + "/" + parcel.getFilename() + "_gatb";
+
+        File file = new File(pathStr);
+
+        if(file.exists())
+        {
+            delete_button.setEnabled(true);
+        }else{
+            delete_button.setEnabled(false);
+            Log.println(Log.INFO,"solid deleter", pathStr + " not found");
+        }
+
+        //System.out.println(path);
+
+    }
 
 
     void updateTV(TextView tv, int kmer, int memory, int disk, String path, int repartition_type, int minimizer_type){
@@ -101,6 +123,7 @@ public class MainActivity extends AppCompatActivity {
         final Button run = (Button) findViewById(R.id.run_button);
         final Spinner dropdown = (Spinner) findViewById(R.id.fastq_files);
         final ImageButton settings_button = (ImageButton) findViewById(R.id.settings_button);
+        final Button delete_button = (Button) findViewById(R.id.delete_button);
         /*******************************/
 
 
@@ -130,6 +153,7 @@ public class MainActivity extends AppCompatActivity {
                         parcel.getRepartition_type(), parcel.getMinimizer_type());
 
 
+                checkForSolids(selectedItem,base_path);
                 /*makes sure that if we press the run button the app won't crash due to a file permission error*/
                 checkPermission();
                 if (tryOpenFile(context,parcel.getFullPath()) && isExternalStorageReadable() && isExternalStorageWritable()) {
@@ -162,15 +186,56 @@ public class MainActivity extends AppCompatActivity {
         /*** run DSK ***/
         run.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-                Intent dskIntent = new Intent(getBaseContext(),DSKRunning.class);
-                dskIntent.putExtra("parcel",parcel);
+                File solids_folder = new File(parcel.getDevicePath() + "/" + parcel.getFilename() + "_gatb");
+                if(solids_folder.exists())
+                {
+                    Intent results_intent = new Intent(getBaseContext(),ResultsActivity.class);
+                    results_intent.putExtra("runtime", "already run");
+                    results_intent.putExtra("filename", parcel.getFilename());
+                    MainActivity.this.startActivity(results_intent);
+                }else{
+                    Intent dskIntent = new Intent(getBaseContext(),DSKRunning.class);
+                    dskIntent.putExtra("parcel",parcel);
 
-                MainActivity.this.startActivity(dskIntent);
+                    MainActivity.this.startActivity(dskIntent);
+                }
+
+
+
 
 
             }
         });
         /****************/
+
+        delete_button.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+
+                String filename = parcel.getFilename();
+                String device_path = parcel.getDevicePath();
+                String path = device_path + "/" + filename + "_gatb";
+
+                File folder = new File(path);
+
+                String[] files = folder.list();
+
+                for(String file : files)
+                {
+                    Log.println(Log.INFO,"deleting", "trying to delete " + path + "/" + file);
+                    File about_to_delete = new File(path + "/" + file);
+                    about_to_delete.delete();
+                }
+
+                folder.delete();
+
+                delete_button.setEnabled(false);
+
+            }
+
+
+        });
+
+
 
 
     }

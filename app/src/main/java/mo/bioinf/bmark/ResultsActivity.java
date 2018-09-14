@@ -62,12 +62,12 @@ public class ResultsActivity extends AppCompatActivity {
 
                 Map<String,String> dna_map = dna_output.getDna_map();
 
-                results_view.append(dna_map.size() + " DNA sequences");
-
-                for(Map.Entry<String,String> entry : dna_map.entrySet())
-                {
-                    results_view.append(entry.getKey() + " " + entry.getValue() + "\n");
-                }
+                results_view.append(dna_map.size() + " DNA sequences written");
+//
+//                for(Map.Entry<String,String> entry : dna_map.entrySet())
+//                {
+//                    results_view.append(entry.getKey() + " " + entry.getValue() + "\n");
+//                }
                 /****************************************************************************************************/
             }
         });

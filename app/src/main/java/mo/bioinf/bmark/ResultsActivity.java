@@ -1,7 +1,9 @@
 package mo.bioinf.bmark;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.sax.StartElementListener;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -16,6 +18,10 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class ResultsActivity extends AppCompatActivity {
+
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,10 +42,9 @@ public class ResultsActivity extends AppCompatActivity {
         tv.setText(results);
 
 
-
-
-        read_dna_button.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v){
+        final Runnable read_dna_runner = new Runnable() {
+            @Override
+            public void run() {
                 final String base_path = context.getFilesDir().getAbsolutePath().toString() + "/";
                 /*** making dna output ***/
                 DnaOutput dna_output = null;
@@ -56,11 +61,7 @@ public class ResultsActivity extends AppCompatActivity {
                     System.out.println(e.getMessage());
                 }
 
-
-
-
                 /************************/
-
 
 
                 /*** determines what the name of the histogram should be, opens it, and reads it into the view ***/
@@ -75,6 +76,16 @@ public class ResultsActivity extends AppCompatActivity {
 //                }
                 /****************************************************************************************************/
             }
+        };
+
+        final Handler handler = new Handler();
+
+
+        read_dna_button.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+                handler.post(read_dna_runner);
+
+            }
         });
 
         done_button.setOnClickListener(new View.OnClickListener(){
@@ -83,5 +94,8 @@ public class ResultsActivity extends AppCompatActivity {
             }
         });
     }
+
+
+
 
 }

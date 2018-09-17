@@ -59,9 +59,9 @@ public class DnaOutput {
 
 
                 byte[] bytes = readBytes(file);
-                List<StringBuilder> stringBytes = toStringBytes(bytes);
+                List<String> stringBytes = toStringBytes(bytes);
 
-                List<StringBuilder> blocks = create_blocks_of_4(stringBytes); // put into groups of 4 nibbles to make it look like hex view
+                List<String> blocks = create_blocks_of_4(stringBytes); // put into groups of 4 nibbles to make it look like hex view
                 pair_hex_to_abundances(blocks);
 
 
@@ -210,8 +210,8 @@ public class DnaOutput {
      * @param input
      * @return
      */
-    private List<StringBuilder> create_blocks_of_4(List<StringBuilder> input){
-        List<StringBuilder> ans = new ArrayList<>();
+    private List<String> create_blocks_of_4(List<String> input){
+        List<String> ans = new ArrayList<>();
         StringBuilder currentStr = new StringBuilder("");
         for(int i = 1; i <= input.size(); i++)
         {
@@ -219,7 +219,7 @@ public class DnaOutput {
             currentStr.append(input.get(i-1));
             if(i%2 == 0)
             {
-                ans.add(currentStr);
+                ans.add(currentStr.toString());
                 //currentStr = "";
                 currentStr.setLength(0); // clear string builder
 
@@ -273,7 +273,7 @@ public class DnaOutput {
      * This method pairs the dna chunk to the abundance chunk for processing later
      * @param input
      */
-    private void pair_hex_to_abundances(List<StringBuilder> input){
+    private void pair_hex_to_abundances(List<String> input){
 
         StringBuilder currentDnaHex = new StringBuilder("");
         StringBuilder currentAbundanceHex = new StringBuilder("");
@@ -327,16 +327,24 @@ public class DnaOutput {
     {
         String[] split = input.split(" ");
 
-        String[] transformed = {transform(split[3]), transform(split[2]),transform(split[1]),transform(split[0])};
-
-        String combined = "";
+        StringBuilder[] transformed = new StringBuilder[4];
 
         for(int i = 0; i < 4; i++)
         {
-            combined += transformed[i];
+            transformed[i] = new StringBuilder(split[3-i]);
+            transform(transformed[i]);
+        }
+
+        //String[] transformed = {transform(split[3]), transform(split[2]),transform(split[1]),transform(split[0])};
+
+        StringBuilder combined = new StringBuilder("");
+
+        for(int i = 0; i < 4; i++)
+        {
+            combined.append(transformed[i]);
         }
         //System.out.println(combined);
-        return String.valueOf((Long.parseLong(combined,16)));
+        return String.valueOf((Long.parseLong(combined.toString(),16)));
 
     }
 
@@ -355,6 +363,10 @@ public class DnaOutput {
         for(int i = 0; i < 4; i++)
         {
             split[i] = new StringBuilder(splitStr[3-i]);
+            transform(split[i]);
+            hex2base4(split[i]);
+            extend(split[i],8);
+            base42dna(split[i]);
         }
 
 
@@ -363,13 +375,6 @@ public class DnaOutput {
             return "error";
         }
 
-        for(int i = 0; i < 4; i++)
-        {
-            transform(split[i]);
-            hex2base4(split[i]);
-            extend(split[i],8);
-            base42dna(split[i]);
-        }
 
 //        String[] hex = {transform(split[3]), transform(split[2]), transform(split[1]), transform(split[0])};
 //
@@ -419,8 +424,9 @@ public class DnaOutput {
 
     public static void hex2base4(StringBuilder input)
     {
+        String old = input.toString();
         input.setLength(0);
-        input.append(Integer.toString(Integer.parseInt(input.toString(),16),4));
+        input.append(Integer.toString(Integer.parseInt(old,16),4));
         //return Integer.toString(Integer.parseInt(input,16),4);
 
     }
@@ -432,14 +438,32 @@ public class DnaOutput {
 
         String original = input.toString();
 
-        String ans = "";
+        StringBuilder substr = new StringBuilder("");
         for(int i = 0; i < difference; i++)
         {
-            ans += "0";
+            substr.append("0");
         }
 
-        //return substr + input;
-       input.append(input);
+        return substr.append(input).toString();
+
+
+    }
+
+    public static void extend(StringBuilder input, int goalSize){
+        int length = input.length();
+
+        int difference = goalSize - length;
+
+        //String original = input.toString();
+
+        //StringBuilder substr = new StringBuilder("");
+
+        for(int i = 0; i < difference; i++)
+        {
+            input.insert(0,'0');
+        }
+
+        //return substr.append(input).toString();
 
 
     }
@@ -473,7 +497,7 @@ public class DnaOutput {
             else if(currentChar == '1')
                 input.setCharAt(i,'C');
             else if(currentChar == '2')
-                input.setCharAt(1,'T');
+                input.setCharAt(i,'T');
             else if(currentChar == '3')
                 input.setCharAt(i,'G');
 

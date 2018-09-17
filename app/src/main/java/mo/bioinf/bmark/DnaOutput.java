@@ -188,9 +188,10 @@ public class DnaOutput {
      * @param input
      * @return
      */
-    private StringBuilder unNegative(StringBuilder input)
+    private String unNegative(String input)
     {
-        return new StringBuilder(input.substring(6,input.length()));
+        //input.setLength(0);
+        return (input.substring(6,input.length()));
     }
 
 
@@ -238,14 +239,14 @@ public class DnaOutput {
      * @param input
      * @return
      */
-    private List<StringBuilder> toStringBytes(byte[] input){
+    private List<String> toStringBytes(byte[] input){
 
         //List<String> ans = new ArrayList<>();
-        List<StringBuilder> ans = new ArrayList<>();
+        List<String> ans = new ArrayList<>();
 
         for(int i = 0; i < input.length; i++){
             int temp = input[i];
-            StringBuilder hex = new StringBuilder(Integer.toHexString(temp));
+            String hex = Integer.toHexString(temp);
             //int parsed = (int) Long.parseLong(hex,16);
 
             if(hex.length() > 2){
@@ -424,17 +425,17 @@ public class DnaOutput {
 
     }
 
-    public static void extend(StringBuilder input, int goalSize){
+    public static String extend(String input, int goalSize){
         int length = input.length();
 
         int difference = goalSize - length;
 
         String original = input.toString();
 
-        input = new StringBuilder("");
+        String ans = "";
         for(int i = 0; i < difference; i++)
         {
-            input.append("0");
+            ans += "0";
         }
 
         //return substr + input;

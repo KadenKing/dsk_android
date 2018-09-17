@@ -59,9 +59,9 @@ public class DnaOutput {
 
 
                 byte[] bytes = readBytes(file);
-                List<String> stringBytes = toStringBytes(bytes);
+                List<StringBuilder> stringBytes = toStringBytes(bytes);
 
-                List<String> blocks = create_blocks_of_4(stringBytes); // put into groups of 4 nibbles to make it look like hex view
+                List<StringBuilder> blocks = create_blocks_of_4(stringBytes); // put into groups of 4 nibbles to make it look like hex view
                 pair_hex_to_abundances(blocks);
 
 
@@ -188,9 +188,9 @@ public class DnaOutput {
      * @param input
      * @return
      */
-    private String unNegative(String input)
+    private StringBuilder unNegative(StringBuilder input)
     {
-        return input.substring(6,input.length());
+        return new StringBuilder(input.substring(6,input.length()));
     }
 
 
@@ -209,16 +209,21 @@ public class DnaOutput {
      * @param input
      * @return
      */
-    private List<String> create_blocks_of_4(List<String> input){
-        List<String> ans = new ArrayList<>();
-        String currentStr = "";
+    private List<StringBuilder> create_blocks_of_4(List<StringBuilder> input){
+        List<StringBuilder> ans = new ArrayList<>();
+        StringBuilder currentStr = new StringBuilder("");
         for(int i = 1; i <= input.size(); i++)
         {
-            currentStr += input.get(i-1);
+            //currentStr += input.get(i-1);
+            currentStr.append(input.get(i-1));
             if(i%2 == 0)
             {
                 ans.add(currentStr);
-                currentStr = "";
+                //currentStr = "";
+                currentStr.setLength(0); // clear string builder
+
+
+                
             }
         }
 
@@ -233,13 +238,14 @@ public class DnaOutput {
      * @param input
      * @return
      */
-    private List<String> toStringBytes(byte[] input){
+    private List<StringBuilder> toStringBytes(byte[] input){
 
-        List<String> ans = new ArrayList<>();
+        //List<String> ans = new ArrayList<>();
+        List<StringBuilder> ans = new ArrayList<>();
 
         for(int i = 0; i < input.length; i++){
             int temp = input[i];
-            String hex = Integer.toHexString(temp);
+            StringBuilder hex = new StringBuilder(Integer.toHexString(temp));
             //int parsed = (int) Long.parseLong(hex,16);
 
             if(hex.length() > 2){
@@ -266,30 +272,34 @@ public class DnaOutput {
      * This method pairs the dna chunk to the abundance chunk for processing later
      * @param input
      */
-    private void pair_hex_to_abundances(List<String> input){
+    private void pair_hex_to_abundances(List<StringBuilder> input){
 
-        String currentDnaHex = "";
-        String currentAbundanceHex = "";
+        StringBuilder currentDnaHex = new StringBuilder("");
+        StringBuilder currentAbundanceHex = new StringBuilder("");
         for(int i = 1; i <= input.size(); i++)
         {
             int place_in_line = i%8;
 
             if(place_in_line <= 4 && place_in_line != 0)
             {
-                currentDnaHex += input.get(i-1) + " ";
+                //currentDnaHex += input.get(i-1) + " ";
+                currentDnaHex.append(input.get(i-1) + " ");
 
 
 
             }else{
-                currentAbundanceHex += input.get(i-1) + " ";
+                //currentAbundanceHex += input.get(i-1) + " ";
+                currentAbundanceHex.append(input.get(i-1) + " ");
             }
 
             if(place_in_line == 0) // finish a line
             {
-               this.hex_map.put(currentDnaHex,currentAbundanceHex);
+               this.hex_map.put(currentDnaHex.toString(),currentAbundanceHex.toString());
 
-                currentDnaHex = "";
-                currentAbundanceHex = "";
+                //currentDnaHex = "";
+                currentDnaHex.setLength(0);
+                currentAbundanceHex.setLength(0); // clear the buffers
+                //currentAbundanceHex = "";
             }
 
 
@@ -338,25 +348,40 @@ public class DnaOutput {
 
     public static String binary2dna(String input, int kmersize)
     {
-        String[] split = input.split(" ");
+        String[] splitStr = input.split(" ");
+
+        StringBuilder[] split = new StringBuilder[4];
+        for(int i = 0; i < 4; i++)
+        {
+            split[i] = new StringBuilder(splitStr[3-i]);
+        }
+
 
         if(split.length != 4)
         {
             return "error";
         }
 
-        String[] hex = {transform(split[3]), transform(split[2]), transform(split[1]), transform(split[0])};
+        for(int i = 0; i < 4; i++)
+        {
+            transform(split[i]);
+            hex2base4(split[i]);
+            extend(split[i],8);
+            base42dna(split[i]);
+        }
 
-        String[] base4 = {hex2base4(hex[0]),hex2base4(hex[1]),hex2base4(hex[2]),hex2base4(hex[3])};
-
-        String[] extended = {extend(base4[0],8),extend(base4[1],8),extend(base4[2],8),extend(base4[3],8)};
-
-        String[] DNA = {base42dna(extended[0]),base42dna(extended[1]),base42dna(extended[2]),base42dna(extended[3])};
+//        String[] hex = {transform(split[3]), transform(split[2]), transform(split[1]), transform(split[0])};
+//
+//        String[] base4 = {hex2base4(hex[0]),hex2base4(hex[1]),hex2base4(hex[2]),hex2base4(hex[3])};
+//
+//        String[] extended = {extend(base4[0],8),extend(base4[1],8),extend(base4[2],8),extend(base4[3],8)};
+//
+//        String[] DNA = {base42dna(extended[0]),base42dna(extended[1]),base42dna(extended[2]),base42dna(extended[3])};
 
         String ans = "";
         for(int i = 0; i < 4; i++)
         {
-            ans += DNA[i];
+            ans += split[i].toString();
         }
 
         if(ans.length() > kmersize)
@@ -369,63 +394,92 @@ public class DnaOutput {
         return ans;
     }
 
-    public static String transform(String input)
+    public static void transform(StringBuilder input)
     {
-        char[] inputChars = input.toCharArray();
-        char[] old = input.toCharArray();
+//        char[] inputChars = input.toCharArray();
+//        char[] old = input.toCharArray();
+        StringBuilder old = new StringBuilder(input);
 
-        inputChars[0] = old[2];
-        inputChars[1] = old[3];
-        inputChars[2] = old[0];
-        inputChars[3] = old[1];
 
-        return String.valueOf(inputChars);
+        input.setCharAt(0,old.charAt(2));
+        input.setCharAt(1,old.charAt(3));
+        input.setCharAt(2,old.charAt(0));
+        input.setCharAt(3,old.charAt(1));
+
+
+//        inputChars[0] = old[2];
+//        inputChars[1] = old[3];
+//        inputChars[2] = old[0];
+//        inputChars[3] = old[1];
+
+        //return input;
 
     }
 
-    public static String hex2base4(String input)
+    public static void hex2base4(StringBuilder input)
     {
-        return Integer.toString(Integer.parseInt(input,16),4);
+        input.setLength(0);
+        input.append(Integer.toString(Integer.parseInt(input.toString(),16),4));
+        //return Integer.toString(Integer.parseInt(input,16),4);
 
     }
 
-    public static String extend(String input, int goalSize){
+    public static void extend(StringBuilder input, int goalSize){
         int length = input.length();
 
         int difference = goalSize - length;
 
-        String substr = "";
+        String original = input.toString();
+
+        input = new StringBuilder("");
         for(int i = 0; i < difference; i++)
         {
-            substr += "0";
+            input.append("0");
         }
 
-        return substr + input;
+        //return substr + input;
+       input.append(input);
 
 
     }
 
-    public static String base42dna(String input)
+    public static void base42dna(StringBuilder input)
     {
-        char[] inputChars = input.toCharArray();
+        //char[] inputChars = input.toCharArray();
+
+//        for(int i = 0; i < input.length(); i++)
+//        {
+//            char currentChar = inputChars[i];
+//
+//            if(currentChar == '0')
+//                inputChars[i] = 'A';
+//            else if(currentChar == '1')
+//                inputChars[i] = 'C';
+//            else if(currentChar == '2')
+//                inputChars[i] = 'T';
+//            else if(currentChar == '3')
+//                inputChars[i] = 'G';
+//            else
+//                return "error";
+//        }
 
         for(int i = 0; i < input.length(); i++)
         {
-            char currentChar = inputChars[i];
+            char currentChar = input.charAt(i);
 
             if(currentChar == '0')
-                inputChars[i] = 'A';
+                input.setCharAt(i,'A');
             else if(currentChar == '1')
-                inputChars[i] = 'C';
+                input.setCharAt(i,'C');
             else if(currentChar == '2')
-                inputChars[i] = 'T';
+                input.setCharAt(1,'T');
             else if(currentChar == '3')
-                inputChars[i] = 'G';
-            else
-                return "error";
+                input.setCharAt(i,'G');
+
+
         }
 
-        return String.valueOf(inputChars);
+        //return String.valueOf(inputChars);
     }
 
 

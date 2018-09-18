@@ -95,8 +95,10 @@ public class DnaOutputTest {
     {
         DnaOutput test = new DnaOutput();
 
+        StringBuilder testb = new StringBuilder("9b2a a1b8 0208 0a00");
+        test.binary2dna(testb,31);
 
-        assertEquals("AAAAATTAATAAAATTGTATTACATTTTCTG",test.binary2dna("9b2a a1b8 0208 0a00",31));
+        assertEquals("AAAAATTAATAAAATTGTATTACATTTTCTG",testb.toString());
     }
 
     @Test

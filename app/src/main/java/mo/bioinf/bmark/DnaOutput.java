@@ -2,6 +2,7 @@ package mo.bioinf.bmark;
 
 import android.content.SyncStatusObserver;
 import android.os.Parcelable;
+import android.util.Log;
 import android.util.Pair;
 
 import java.io.BufferedReader;
@@ -25,8 +26,12 @@ public class DnaOutput {
 
     private List<File> solids = new ArrayList<>();
 
-    private Map<String,String> hex_map = new HashMap<>();
-    private Map<String, String> dna_map = new HashMap<>();
+
+    private List<StringBuilder> dna_strings = new ArrayList<>();
+    private List <StringBuilder> abundance_strings = new ArrayList<>();
+
+
+    //private Map<String, String> dna_map = new HashMap<>();
 
     private String fastq_name = "";
     private String basepath = "";
@@ -47,11 +52,21 @@ public class DnaOutput {
         this.basepath = basepath;
 
         find_solids();
+        DnaWriter dna_writer = null;
+        try{
+            dna_writer = new DnaWriter();
+        }catch(java.io.IOException e)
+        {
+            System.out.println("error: " + e.getMessage());
+        }
+
 
         for(File file : this.solids)
         {
-            this.hex_map.clear(); // clears hashmap for new read
+            //this.hex_map.clear(); // clears hashmap for new read
 
+            dna_strings.clear();
+            abundance_strings.clear();
 
             if(file.exists() && file.canRead()) {
 
@@ -65,10 +80,13 @@ public class DnaOutput {
                 pair_hex_to_abundances(blocks);
 
 
-                for(Map.Entry<String,String> entry : this.hex_map.entrySet())
+                for(int i = 0; i < dna_strings.size(); i++)
                 {
                     //System.out.println("DNA: " + binary2dna(entry.getKey(),31) + " - Abundance: " + transformed_hex_to_dec(entry.getValue()));
-                    dna_map.put(binary2dna(entry.getKey(),31),transformed_hex_to_dec(entry.getValue()));
+                    //dna_map.put(binary2dna(entry.getKey(),31),transformed_hex_to_dec(entry.getValue()));
+                    binary2dna(dna_strings.get(i),31);
+                    transformed_hex_to_dec(abundance_strings.get(i));
+                    dna_writer.write(dna_strings.get(i),abundance_strings.get(i));
                 }
 
 
@@ -77,7 +95,9 @@ public class DnaOutput {
 
         }
 
-        write_to_file();
+        //write_to_file();
+
+        dna_writer.close();
 
     }
 
@@ -111,39 +131,43 @@ public class DnaOutput {
     /**
      * writes the dna_map file into a txt file.
      */
-    public void write_to_file()
-    {
-        String path = this.basepath + this.fastq_name + "_dna.txt";
-
-        File file = new File(path);
-
-        try{
-
-            BufferedWriter writer = new BufferedWriter(new FileWriter(path));
-
-            for(Map.Entry<String,String> entry : this.dna_map.entrySet())
-            {
-                writer.write(entry.getKey() + " " + entry.getValue() + "\n");
-                //System.out.println("wrote");
-            }
-
-            writer.close();
-
-        }catch(java.io.IOException e)
-        {
-            System.out.println(e.getMessage());
-        }
-
-    }
+//    public void write_to_file()
+//    {
+//        String path = this.basepath + this.fastq_name + "_dna.txt";
+//
+//        File file = new File(path);
+//
+//        try{
+//
+//            BufferedWriter writer = new BufferedWriter(new FileWriter(path));
+//
+//            for(Map.Entry<String,String> entry : this.dna_map.entrySet())
+//            {
+//                writer.write(entry.getKey() + " " + entry.getValue() + "\n");
+//                //System.out.println("wrote");
+//            }
+//
+//            writer.close();
+//
+//        }catch(java.io.IOException e)
+//        {
+//            System.out.println(e.getMessage());
+//        }
+//
+//    }
 
     private class DnaWriter{
         private BufferedWriter writer;
 
-        DnaWriter(String path) throws java.io.IOException{
+        DnaWriter() throws java.io.IOException{
+            String path = basepath + fastq_name + "_dna.txt";
+
+            File file = new File(path);
+
             writer = new BufferedWriter(new FileWriter(path));
         }
 
-        public void write(String dna, String abundance)
+        public void write(StringBuilder dna, StringBuilder abundance)
         {
             try{
                 writer.write(dna + " " + abundance + "\n");
@@ -165,13 +189,10 @@ public class DnaOutput {
 
     }
 
-    public Map<String, String> getHex_map() {
-        return hex_map;
-    }
 
-    public Map<String, String> getDna_map() {
-        return dna_map;
-    }
+//    //public Map<String, String> getDna_map() {
+//        return dna_map;
+//    }
 
 
     /**
@@ -306,6 +327,7 @@ public class DnaOutput {
 
         StringBuilder currentDnaHex = new StringBuilder("");
         StringBuilder currentAbundanceHex = new StringBuilder("");
+        Log.println(Log.INFO, "input", input.get(0));
         for(int i = 1; i <= input.size(); i++)
         {
             int place_in_line = i%8;
@@ -324,7 +346,13 @@ public class DnaOutput {
 
             if(place_in_line == 0) // finish a line
             {
-               this.hex_map.put(currentDnaHex.toString(),currentAbundanceHex.toString());
+               //this.hex_map.put(currentDnaHex.toString(),currentAbundanceHex.toString());
+
+                Log.println(Log.INFO, "pairing ", "DNA: " + currentDnaHex);
+                Log.println(Log.INFO, "pairing ", "ABUNDANCE: " + currentAbundanceHex);
+                this.dna_strings.add(new StringBuilder(currentDnaHex));
+                this.abundance_strings.add(new StringBuilder(currentAbundanceHex));
+
 
                 //currentDnaHex = "";
                 currentDnaHex.setLength(0);
@@ -352,9 +380,9 @@ public class DnaOutput {
      * @param input
      * @return
      */
-    private String transformed_hex_to_dec(String input)
+    private void transformed_hex_to_dec(StringBuilder input)
     {
-        String[] split = input.split(" ");
+        String[] split = input.toString().split(" ");
 
         StringBuilder[] transformed = new StringBuilder[4];
 
@@ -373,7 +401,9 @@ public class DnaOutput {
             combined.append(transformed[i]);
         }
         //System.out.println(combined);
-        return String.valueOf((Long.parseLong(combined.toString(),16)));
+        input.setLength(0);
+        input.append(String.valueOf((Long.parseLong(combined.toString(),16))));
+        //return String.valueOf((Long.parseLong(combined.toString(),16)));
 
     }
 
@@ -384,9 +414,14 @@ public class DnaOutput {
 
 
 
-    public static String binary2dna(String input, int kmersize)
+    public static void binary2dna(StringBuilder input, int kmersize)
     {
-        String[] splitStr = input.split(" ");
+        String[] splitStr = input.toString().split(" ");
+
+//        if(splitStr.length != 4)
+//        {
+//            Log.println(Log.INFO, "binary2dna", "out: " + input.toString());
+//        }
 
         StringBuilder[] split = new StringBuilder[4];
         for(int i = 0; i < 4; i++)
@@ -399,10 +434,7 @@ public class DnaOutput {
         }
 
 
-        if(split.length != 4)
-        {
-            return "error";
-        }
+
 
 
 //        String[] hex = {transform(split[3]), transform(split[2]), transform(split[1]), transform(split[0])};
@@ -425,8 +457,9 @@ public class DnaOutput {
             ans = ans.substring(difference,ans.length());
         }
 
-
-        return ans;
+        input.setLength(0);
+        input.append(ans);
+        //return ans;
     }
 
     public static void transform(StringBuilder input)

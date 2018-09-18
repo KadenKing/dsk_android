@@ -66,9 +66,9 @@ public class ResultsActivity extends AppCompatActivity {
 
                 /*** determines what the name of the histogram should be, opens it, and reads it into the view ***/
 
-                Map<String,String> dna_map = dna_output.getDna_map();
+                //Map<String,String> dna_map = dna_output.getDna_map();
 
-                results_view.append(dna_map.size() + " DNA sequences written \n Took " + runtime + " milliseconds");
+                results_view.append(runtime + " milliseconds");
 //
 //                for(Map.Entry<String,String> entry : dna_map.entrySet())
 //                {

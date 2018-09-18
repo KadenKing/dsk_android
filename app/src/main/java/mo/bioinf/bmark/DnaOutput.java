@@ -136,6 +136,35 @@ public class DnaOutput {
 
     }
 
+    private class DnaWriter{
+        private BufferedWriter writer;
+
+        DnaWriter(String path) throws java.io.IOException{
+            writer = new BufferedWriter(new FileWriter(path));
+        }
+
+        public void write(String dna, String abundance)
+        {
+            try{
+                writer.write(dna + " " + abundance + "\n");
+            }catch(java.io.IOException e){
+                System.out.println("write error: " + e.getMessage());
+            }
+
+        }
+
+        public void close(){
+            try{
+                writer.close();
+            }catch(java.io.IOException e)
+            {
+                System.out.println("close error " + e.getMessage());
+            }
+
+        }
+
+    }
+
     public Map<String, String> getHex_map() {
         return hex_map;
     }

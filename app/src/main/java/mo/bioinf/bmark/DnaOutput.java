@@ -2,6 +2,7 @@ package mo.bioinf.bmark;
 
 import android.content.SyncStatusObserver;
 import android.os.Parcelable;
+import android.support.v4.content.res.TypedArrayUtils;
 import android.util.Log;
 import android.util.Pair;
 
@@ -18,6 +19,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Arrays;
+
 
 public class DnaOutput {
 
@@ -60,37 +63,44 @@ public class DnaOutput {
             System.out.println("error: " + e.getMessage());
         }
 
+        List<byte[]> list_bytes = new ArrayList<>();
 
         for(File file : this.solids)
+        {
+            list_bytes.add(readBytes(file));
+        }
+
+
+        for(byte[] bytes : list_bytes)
         {
             //this.hex_map.clear(); // clears hashmap for new read
 
             dna_strings.clear();
             abundance_strings.clear();
 
-            if(file.exists() && file.canRead()) {
-
-                System.out.println("exists and can read");
 
 
-                byte[] bytes = readBytes(file);
-                List<String> stringBytes = toStringBytes(bytes);
-
-                List<String> blocks = create_blocks_of_4(stringBytes); // put into groups of 4 nibbles to make it look like hex view
-                pair_hex_to_abundances(blocks);
+            System.out.println("exists and can read");
 
 
-                for(int i = 0; i < dna_strings.size(); i++)
-                {
-                    //System.out.println("DNA: " + binary2dna(entry.getKey(),31) + " - Abundance: " + transformed_hex_to_dec(entry.getValue()));
-                    //dna_map.put(binary2dna(entry.getKey(),31),transformed_hex_to_dec(entry.getValue()));
-                    binary2dna(dna_strings.get(i),31);
-                    transformed_hex_to_dec(abundance_strings.get(i));
-                    dna_writer.write(dna_strings.get(i),abundance_strings.get(i));
-                }
+            //byte[] bytes = readBytes(file);
+            List<String> stringBytes = toStringBytes(bytes);
+
+            List<String> blocks = create_blocks_of_4(stringBytes); // put into groups of 4 nibbles to make it look like hex view
+            pair_hex_to_abundances(blocks);
 
 
+            for(int i = 0; i < dna_strings.size(); i++)
+            {
+                //System.out.println("DNA: " + binary2dna(entry.getKey(),31) + " - Abundance: " + transformed_hex_to_dec(entry.getValue()));
+                //dna_map.put(binary2dna(entry.getKey(),31),transformed_hex_to_dec(entry.getValue()));
+                binary2dna(dna_strings.get(i),31);
+                transformed_hex_to_dec(abundance_strings.get(i));
+                dna_writer.write(dna_strings.get(i),abundance_strings.get(i));
             }
+
+
+
 
 
         }

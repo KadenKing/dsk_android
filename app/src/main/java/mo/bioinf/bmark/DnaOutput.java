@@ -55,7 +55,7 @@ public class DnaOutput {
         this.fastq_name = fastq_name;
         this.basepath = basepath;
 
-        find_solids();
+        //find_solids();
 
 
         List<byte[]> list_bytes = new ArrayList<>(8);
@@ -111,27 +111,7 @@ public class DnaOutput {
      * based on based path and filename, it finds all of the dsk solids.
      * It puts them into a list of files that will later be read and parsed
      */
-    private void find_solids()
-    {
-        int count = 0;
 
-
-        while(true)
-        {
-            String path = this.basepath + this.fastq_name + "_gatb/dsk.solid." + count;
-            File file = new File(path);
-            if(file.exists() && file.canRead())
-            {
-                this.solids.add(file);
-                count++;
-            }else{
-                System.out.println("could not find " + path);
-                break;
-            }
-
-        }
-
-    }
 
 
     /**

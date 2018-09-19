@@ -17,6 +17,47 @@ import static org.junit.Assert.*;
 
 public class DnaOutputTest {
 
+    @Test
+    public void firstAndLastTest(){
+        ByteReader test = new ByteReader("ERR1539057", "/home/kaden/Documents/dsk/build/bin/");
+
+        String first = test.getNext();
+
+        String last = "";
+        while(test.hasNext())
+        {
+            last = test.getNext();
+            System.out.println(last);
+        }
+
+        assertEquals("0000", last);
+
+    }
+
+    @Test
+    public void unNegativeTest()
+    {
+        ByteReader test = new ByteReader();
+
+        StringBuilder tb = new StringBuilder("FFFFFFAB");
+
+        test.unNegative(tb);
+
+        assertEquals("AB",tb.toString());
+    }
+
+
+    @Test
+    public void get_2_bytes_test()
+    {
+        ByteReader test = new ByteReader("ERR1539057", "/home/kaden/Documents/dsk/build/bin/");
+
+        String tb = test.getNext();
+        tb = test.getNext();
+
+        assertEquals("c400", tb);
+
+    }
 
 //    @Test
 //    public void multipleFilesTest()
@@ -90,59 +131,59 @@ public class DnaOutputTest {
 //
 //    }
 //
-    @Test
-    public void hex2stringtext()
-    {
-        DnaOutput test = new DnaOutput();
-
-        StringBuilder testb = new StringBuilder("9b2a a1b8 0208 0a00");
-        test.binary2dna(testb,31);
-
-        assertEquals("AAAAATTAATAAAATTGTATTACATTTTCTG",testb.toString());
-    }
-
-    @Test
-    public void transfortest()
-    {
-        DnaOutput test = new DnaOutput();
-
-        StringBuilder testb = new StringBuilder("023c");
-        test.transform(testb);
-
-        assertEquals("3c02", testb.toString());
-    }
-
-    @Test
-    public void basetest()
-    {
-        DnaOutput test = new DnaOutput();
-
-        StringBuilder testb = new StringBuilder("3c02");
-        test.hex2base4(testb);
-
-        assertEquals("3300002", testb.toString());
-    }
-
-    @Test
-    public void extendtest()
-    {
-        DnaOutput test = new DnaOutput();
-
-        StringBuilder testb = new StringBuilder("3300002");
-        test.extend(testb,8);
-
-        assertEquals("03300002", testb.toString());
-    }
-
-    @Test
-    public void base42dnatest()
-    {
-        DnaOutput test = new DnaOutput();
-
-        StringBuilder testb = new StringBuilder("03300002");
-        test.base42dna(testb);
-
-
-        assertEquals("AGGAAAAT", testb.toString());
-    }
+//    @Test
+//    public void hex2stringtext()
+//    {
+//        DnaOutput test = new DnaOutput();
+//
+//        StringBuilder testb = new StringBuilder("9b2a a1b8 0208 0a00");
+//        test.binary2dna(testb,31);
+//
+//        assertEquals("AAAAATTAATAAAATTGTATTACATTTTCTG",testb.toString());
+//    }
+//
+//    @Test
+//    public void transfortest()
+//    {
+//        DnaOutput test = new DnaOutput();
+//
+//        StringBuilder testb = new StringBuilder("023c");
+//        test.transform(testb);
+//
+//        assertEquals("3c02", testb.toString());
+//    }
+//
+//    @Test
+//    public void basetest()
+//    {
+//        DnaOutput test = new DnaOutput();
+//
+//        StringBuilder testb = new StringBuilder("3c02");
+//        test.hex2base4(testb);
+//
+//        assertEquals("3300002", testb.toString());
+//    }
+//
+//    @Test
+//    public void extendtest()
+//    {
+//        DnaOutput test = new DnaOutput();
+//
+//        StringBuilder testb = new StringBuilder("3300002");
+//        test.extend(testb,8);
+//
+//        assertEquals("03300002", testb.toString());
+//    }
+//
+//    @Test
+//    public void base42dnatest()
+//    {
+//        DnaOutput test = new DnaOutput();
+//
+//        StringBuilder testb = new StringBuilder("03300002");
+//        test.base42dna(testb);
+//
+//
+//        assertEquals("AGGAAAAT", testb.toString());
+//    }
 }

@@ -53,9 +53,9 @@ public class DnaOutputTest {
         ByteReader test = new ByteReader("ERR1539057", "/home/kaden/Documents/dsk/build/bin/");
 
         String tb = test.getNext();
-        tb = test.getNext();
+        //tb = test.getNext();
 
-        assertEquals("c400", tb);
+        assertEquals("023c", tb);
 
     }
 

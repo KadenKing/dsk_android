@@ -53,9 +53,20 @@ public class ByteReader {
 
         String ans = this.next;
 
+        if(index_at_end()){
+            if(this.solids_queue.isEmpty())
+            {
+                this.has_next_line = false;
+                return ans;
+            }else{
+                load_bytes();
+            }
+        }
+
+
         this.next = get_2_bytes();
 
-        //check_if_can_get_next();
+
 
 
 
@@ -70,26 +81,12 @@ public class ByteReader {
         return this.has_next_line;
     }
 
-    private void check_if_can_get_next()
+    private boolean index_at_end()
     {
-        // check if at end of char array
-
-
-        if(this.byte_index > (this.current_bytes.length))
-        {
-            // check if there's another solid file in the queue
-            if(this.solids_queue.isEmpty())
-            {
-
-
-                this.has_next_line = false;
-            }else{
-                load_bytes();
-            }
-        }
-
-
-
+        if(this.byte_index == this.current_bytes.length)
+            return true;
+        else
+            return false;
     }
 
     /**
@@ -98,6 +95,7 @@ public class ByteReader {
      */
     public String get_2_bytes()
     {
+
         StringBuilder ans = new StringBuilder("");
 
         //byte[] bytes = new byte[2];
@@ -125,8 +123,6 @@ public class ByteReader {
         }
 
 
-
-        check_if_can_get_next();
 
         return ans.toString();
 

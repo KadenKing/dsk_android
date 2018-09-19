@@ -208,6 +208,10 @@ public class ByteReader {
 
     }
 
+    /**
+     * based on based path and filename, it finds all of the dsk solids.
+     * It puts them into a list of files that will later be read and parsed
+     */
     private void find_solids()
     {
         int count = 0;

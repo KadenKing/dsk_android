@@ -18,46 +18,63 @@ import static org.junit.Assert.*;
 public class DnaOutputTest {
 
     @Test
-    public void firstAndLastTest(){
-        ByteReader test = new ByteReader("ERR1539057", "/home/kaden/Documents/dsk/build/bin/");
 
-        String first = test.getNext();
+    public void working_togeher()
+    {
+        DnaOutput test = null;
 
-        String last = "";
-        while(test.hasNext())
+        try{
+            test = new DnaOutput("ERR1539057", "/home/kaden/Documents/dsk/build/bin/");
+
+        }catch(java.io.FileNotFoundException e)
         {
-            last = test.getNext();
-            System.out.println(last);
+            System.out.println(e.getMessage());
         }
 
-        assertEquals("0000", last);
 
     }
 
-    @Test
-    public void unNegativeTest()
-    {
-        ByteReader test = new ByteReader();
+//    @Test
+//    public void firstAndLastTest(){
+//        ByteReader test = new ByteReader("ERR1539057", "/home/kaden/Documents/dsk/build/bin/");
+//
+//        String first = test.getNext();
+//
+//        String last = "";
+//        while(test.hasNext())
+//        {
+//            last = test.getNext();
+//            //System.out.println(last);
+//        }
+//
+//        assertEquals("0000", last);
+//
+//    }
 
-        StringBuilder tb = new StringBuilder("FFFFFFAB");
-
-        test.unNegative(tb);
-
-        assertEquals("AB",tb.toString());
-    }
-
-
-    @Test
-    public void get_2_bytes_test()
-    {
-        ByteReader test = new ByteReader("ERR1539057", "/home/kaden/Documents/dsk/build/bin/");
-
-        String tb = test.getNext();
-        //tb = test.getNext();
-
-        assertEquals("023c", tb);
-
-    }
+//    @Test
+//    public void unNegativeTest()
+//    {
+//        ByteReader test = new ByteReader();
+//
+//        StringBuilder tb = new StringBuilder("FFFFFFAB");
+//
+//        test.unNegative(tb);
+//
+//        assertEquals("AB",tb.toString());
+//    }
+//
+//
+//    @Test
+//    public void get_2_bytes_test()
+//    {
+//        ByteReader test = new ByteReader("ERR1539057", "/home/kaden/Documents/dsk/build/bin/");
+//
+//        String tb = test.getNext();
+//        //tb = test.getNext();
+//
+//        assertEquals("023c", tb);
+//
+//    }
 
 //    @Test
 //    public void multipleFilesTest()

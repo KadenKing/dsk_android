@@ -51,66 +51,55 @@ public class DnaOutput {
      * @throws java.io.FileNotFoundException
      */
     public DnaOutput(String fastq_name, String basepath) throws java.io.FileNotFoundException{
-
         this.fastq_name = fastq_name;
         this.basepath = basepath;
 
-        //find_solids();
+        DnaWriter writer = new DnaWriter();
 
+        ByteReader reader = new ByteReader(fastq_name,basepath);
 
-        List<byte[]> list_bytes = new ArrayList<>(8);
-
-        for(File file : this.solids)
+        StringBuilder current_dna_read = new StringBuilder("");
+        StringBuilder current_abundance_read = new StringBuilder("");
+        while(reader.hasNext())
         {
-            list_bytes.add(readBytes(file));
-        }
+            for(int i = 0; i < 4; i++)
+            {
+                current_dna_read.append(reader.getNext());
+                if(i!=3)
+                {
+                    current_dna_read.append(" ");
+                }
+            }
 
-
-        for(byte[] bytes : list_bytes)
-        {
-            //this.hex_map.clear(); // clears hashmap for new read
-
-//            dna_strings.clear();
-//            abundance_strings.clear();
-
-
-
-
-            System.out.println("exists and can read");
-
-
-            //byte[] bytes = readBytes(file);
-            List<String> stringBytes = toStringBytes(bytes);
-
-            List<String> blocks = create_blocks_of_4(stringBytes); // put into groups of 4 nibbles to make it look like hex view
-            pair_hex_to_abundances(blocks);
-
-
-//            for(int i = 0; i < dna_strings.size(); i++)
-//            {
-//                //System.out.println("DNA: " + binary2dna(entry.getKey(),31) + " - Abundance: " + transformed_hex_to_dec(entry.getValue()));
-//                //dna_map.put(binary2dna(entry.getKey(),31),transformed_hex_to_dec(entry.getValue()));
-//                binary2dna(dna_strings.get(i),31);
-//                transformed_hex_to_dec(abundance_strings.get(i));
-//                dna_writer.write(dna_strings.get(i),abundance_strings.get(i));
-//            }
+            binary2dna(current_dna_read,31);
 
 
 
+            for(int i = 0; i < 4; i++)
+            {
+                current_abundance_read.append(reader.getNext());
+                if(i!=3)
+                {
+                    current_abundance_read.append(" ");
+                }
+            }
 
+            transformed_hex_to_dec(current_abundance_read);
+
+            writer.write(current_dna_read,current_abundance_read);
+
+            current_abundance_read.setLength(0);
+            current_dna_read.setLength(0);
 
         }
 
-        //write_to_file();
+        writer.close();
 
-        //dna_writer.close();
 
     }
 
-    /**
-     * based on based path and filename, it finds all of the dsk solids.
-     * It puts them into a list of files that will later be read and parsed
-     */
+
+
 
 
 

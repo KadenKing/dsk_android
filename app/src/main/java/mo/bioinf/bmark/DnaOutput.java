@@ -26,12 +26,13 @@ public class DnaOutput {
 
     //private List<String> DNA_sequences = new ArrayList<String>();
 
+    private DnaWriter dna_writer = new DnaWriter();
 
     private List<File> solids = new ArrayList<>();
 
 
-    private List<StringBuilder> dna_strings = new ArrayList<>();
-    private List <StringBuilder> abundance_strings = new ArrayList<>();
+//    private List<StringBuilder> dna_strings = new ArrayList<>();
+//    private List <StringBuilder> abundance_strings = new ArrayList<>();
 
 
     //private Map<String, String> dna_map = new HashMap<>();
@@ -55,15 +56,9 @@ public class DnaOutput {
         this.basepath = basepath;
 
         find_solids();
-        DnaWriter dna_writer = null;
-        try{
-            dna_writer = new DnaWriter();
-        }catch(java.io.IOException e)
-        {
-            System.out.println("error: " + e.getMessage());
-        }
 
-        List<byte[]> list_bytes = new ArrayList<>();
+
+        List<byte[]> list_bytes = new ArrayList<>(8);
 
         for(File file : this.solids)
         {
@@ -75,8 +70,9 @@ public class DnaOutput {
         {
             //this.hex_map.clear(); // clears hashmap for new read
 
-            dna_strings.clear();
-            abundance_strings.clear();
+//            dna_strings.clear();
+//            abundance_strings.clear();
+
 
 
 
@@ -90,14 +86,14 @@ public class DnaOutput {
             pair_hex_to_abundances(blocks);
 
 
-            for(int i = 0; i < dna_strings.size(); i++)
-            {
-                //System.out.println("DNA: " + binary2dna(entry.getKey(),31) + " - Abundance: " + transformed_hex_to_dec(entry.getValue()));
-                //dna_map.put(binary2dna(entry.getKey(),31),transformed_hex_to_dec(entry.getValue()));
-                binary2dna(dna_strings.get(i),31);
-                transformed_hex_to_dec(abundance_strings.get(i));
-                dna_writer.write(dna_strings.get(i),abundance_strings.get(i));
-            }
+//            for(int i = 0; i < dna_strings.size(); i++)
+//            {
+//                //System.out.println("DNA: " + binary2dna(entry.getKey(),31) + " - Abundance: " + transformed_hex_to_dec(entry.getValue()));
+//                //dna_map.put(binary2dna(entry.getKey(),31),transformed_hex_to_dec(entry.getValue()));
+//                binary2dna(dna_strings.get(i),31);
+//                transformed_hex_to_dec(abundance_strings.get(i));
+//                dna_writer.write(dna_strings.get(i),abundance_strings.get(i));
+//            }
 
 
 
@@ -107,7 +103,7 @@ public class DnaOutput {
 
         //write_to_file();
 
-        dna_writer.close();
+        //dna_writer.close();
 
     }
 
@@ -169,12 +165,18 @@ public class DnaOutput {
     private class DnaWriter{
         private BufferedWriter writer;
 
-        DnaWriter() throws java.io.IOException{
+
+        DnaWriter(){
             String path = basepath + fastq_name + "_dna.txt";
 
             File file = new File(path);
+            try{
+                writer = new BufferedWriter(new FileWriter(path));
+            }catch(java.io.IOException e)
+            {
+                System.out.println("error" + e.getMessage());
+            }
 
-            writer = new BufferedWriter(new FileWriter(path));
         }
 
         public void write(StringBuilder dna, StringBuilder abundance)
@@ -271,7 +273,7 @@ public class DnaOutput {
      * @return
      */
     private List<String> create_blocks_of_4(List<String> input){
-        List<String> ans = new ArrayList<>();
+        List<String> ans = new ArrayList<>(input.size()/2);
         StringBuilder currentStr = new StringBuilder("");
         for(int i = 1; i <= input.size(); i++)
         {
@@ -288,6 +290,9 @@ public class DnaOutput {
             }
         }
 
+//        Log.println(Log.INFO, "input size", String.valueOf(input.size()));
+//        Log.println(Log.INFO, "output size", String.valueOf(ans.size()));
+
         return ans;
     }
 
@@ -302,7 +307,7 @@ public class DnaOutput {
     private List<String> toStringBytes(byte[] input){
 
         //List<String> ans = new ArrayList<>();
-        List<String> ans = new ArrayList<>();
+        List<String> ans = new ArrayList<>(input.length);
 
         for(int i = 0; i < input.length; i++){
             int temp = input[i];
@@ -318,6 +323,10 @@ public class DnaOutput {
             }
 
         }
+
+//        Log.println(Log.INFO, "byte size", String.valueOf(input.length));
+//        Log.println(Log.INFO, "list size", String.valueOf(ans.size()));
+
 
         return ans;
 
@@ -335,9 +344,17 @@ public class DnaOutput {
      */
     private void pair_hex_to_abundances(List<String> input){
 
+//        DnaWriter dna_writer = null;
+//        try{
+//            dna_writer = new DnaWriter();
+//        }catch(java.io.IOException e)
+//        {
+//            System.out.println("error: " + e.getMessage());
+//        }
+
         StringBuilder currentDnaHex = new StringBuilder("");
         StringBuilder currentAbundanceHex = new StringBuilder("");
-        Log.println(Log.INFO, "input", input.get(0));
+        //Log.println(Log.INFO, "input", input.get(0));
         for(int i = 1; i <= input.size(); i++)
         {
             int place_in_line = i%8;
@@ -358,10 +375,16 @@ public class DnaOutput {
             {
                //this.hex_map.put(currentDnaHex.toString(),currentAbundanceHex.toString());
 
-                Log.println(Log.INFO, "pairing ", "DNA: " + currentDnaHex);
-                Log.println(Log.INFO, "pairing ", "ABUNDANCE: " + currentAbundanceHex);
-                this.dna_strings.add(new StringBuilder(currentDnaHex));
-                this.abundance_strings.add(new StringBuilder(currentAbundanceHex));
+//                Log.println(Log.INFO, "pairing ", "DNA: " + currentDnaHex);
+//                Log.println(Log.INFO, "pairing ", "ABUNDANCE: " + currentAbundanceHex);
+
+                binary2dna(currentDnaHex,31);
+                transformed_hex_to_dec(currentAbundanceHex);
+
+                dna_writer.write(currentDnaHex,currentAbundanceHex);
+
+//                this.dna_strings.add(new StringBuilder(currentDnaHex));
+//                this.abundance_strings.add(new StringBuilder(currentAbundanceHex));
 
 
                 //currentDnaHex = "";
@@ -372,6 +395,8 @@ public class DnaOutput {
 
 
         }
+
+        //dna_writer.close();
 
 
     }

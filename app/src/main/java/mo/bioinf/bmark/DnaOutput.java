@@ -26,6 +26,8 @@ public class DnaOutput {
 
     //private List<String> DNA_sequences = new ArrayList<String>();
 
+    public long line_count = 0;
+
     private DnaWriter dna_writer = new DnaWriter();
 
     private List<File> solids = new ArrayList<>();
@@ -87,6 +89,7 @@ public class DnaOutput {
             transformed_hex_to_dec(current_abundance_read);
 
             writer.write(current_dna_read,current_abundance_read);
+            this.line_count++;
 
             current_abundance_read.setLength(0);
             current_dna_read.setLength(0);

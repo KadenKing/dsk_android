@@ -39,7 +39,18 @@ public class ByteReader {
         this.next = get_2_bytes();
 
 
+    }
 
+    ByteReader(String fastq_name,String basepath, int file_num)
+    {
+        this.fastq_name = fastq_name;
+        this.basepath = basepath;
+
+        find_single_solid(file_num);
+
+        load_bytes();
+
+        this.next = get_2_bytes();
     }
 
     ByteReader(){}
@@ -205,6 +216,27 @@ public class ByteReader {
 
         return null;
 
+
+    }
+
+    /**
+     * this one is used for multithreading. Each reader will have a queue of only on file.
+     * @param file_num
+     */
+    private void find_single_solid(int file_num)
+    {
+        String path = this.basepath + this.fastq_name + "_gatb/dsk.solid." + file_num;
+        File file = new File(path);
+
+        if(file.exists() && file.canRead())
+        {
+            this.solids_queue.add(file); // this will be the only file in the queue
+            this.has_next_line = true;
+
+        }else{
+            System.out.println("could not find " + path);
+
+        }
 
     }
 

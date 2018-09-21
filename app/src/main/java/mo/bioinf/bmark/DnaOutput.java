@@ -1,43 +1,31 @@
 package mo.bioinf.bmark;
-
-import android.content.SyncStatusObserver;
-import android.os.Parcelable;
-import android.support.v4.content.res.TypedArrayUtils;
-import android.util.Log;
-import android.util.Pair;
-
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.Arrays;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.BlockingQueue;
 
 
 public class DnaOutput {
 
-    //private List<String> DNA_sequences = new ArrayList<String>();
 
+  /*** multithreading objects ****/
+  BlockingQueue bqueue = new ArrayBlockingQueue(1024);
+  boolean reading_done = false;
+
+
+  /*******************************/
+
+    //private List<String> DNA_sequences = new ArrayList<String>();
     public long line_count = 0;
 
     private DnaWriter dna_writer = new DnaWriter();
 
-    private List<File> solids = new ArrayList<>();
 
 
-//    private List<StringBuilder> dna_strings = new ArrayList<>();
-//    private List <StringBuilder> abundance_strings = new ArrayList<>();
-
-
-    //private Map<String, String> dna_map = new HashMap<>();
 
     private String fastq_name = "";
     private String basepath = "";
@@ -58,81 +46,155 @@ public class DnaOutput {
 
         DnaWriter writer = new DnaWriter();
 
-        ByteReader reader = new ByteReader(fastq_name,basepath);
-
-        StringBuilder current_dna_read = new StringBuilder("");
-        StringBuilder current_abundance_read = new StringBuilder("");
-        while(reader.hasNext())
-        {
-            for(int i = 0; i < 4; i++)
-            {
-                current_dna_read.append(reader.getNext());
-                if(i!=3)
-                {
-                    current_dna_read.append(" ");
-                }
-            }
-
-            binary2dna(current_dna_read,31);
-
-
-
-            for(int i = 0; i < 4; i++)
-            {
-                current_abundance_read.append(reader.getNext());
-                if(i!=3)
-                {
-                    current_abundance_read.append(" ");
-                }
-            }
-
-            transformed_hex_to_dec(current_abundance_read);
-
-            writer.write(current_dna_read,current_abundance_read);
-            this.line_count++;
-
-            current_abundance_read.setLength(0);
-            current_dna_read.setLength(0);
-
-        }
 
         writer.close();
 
 
     }
 
-
-
-
-
-
     /**
-     * writes the dna_map file into a txt file.
+     * multithreaded version of dna output
+     *
+     *
+     * @param fastq_name
+     * @param basepath
+     * @throws java.io.FileNotFoundException
      */
-//    public void write_to_file()
-//    {
-//        String path = this.basepath + this.fastq_name + "_dna.txt";
-//
-//        File file = new File(path);
-//
-//        try{
-//
-//            BufferedWriter writer = new BufferedWriter(new FileWriter(path));
-//
-//            for(Map.Entry<String,String> entry : this.dna_map.entrySet())
-//            {
-//                writer.write(entry.getKey() + " " + entry.getValue() + "\n");
-//                //System.out.println("wrote");
-//            }
-//
-//            writer.close();
-//
-//        }catch(java.io.IOException e)
-//        {
-//            System.out.println(e.getMessage());
-//        }
-//
-//    }
+    public DnaOutput(String fastq_name, String basepath, boolean multithreaded) throws java.io.FileNotFoundException{
+        this.fastq_name = fastq_name;
+        this.basepath = basepath;
+
+
+
+        DnaWriter writer = new DnaWriter();
+
+        Consumer consumer = new Consumer(this.bqueue,writer);
+
+        Thread consumer_thread = new Thread(consumer);
+
+        consumer_thread.start();
+
+        List<Thread> producer_list = new ArrayList<>();
+        for(int i = 0; i < 4; i++)
+        {
+            Thread newthread = new Thread(new Producer(this.bqueue,i));
+            newthread.start();
+            producer_list.add(newthread);
+        }
+
+        for(int i = 0; i < producer_list.size(); i++)
+        {
+            try{
+                producer_list.get(i).join();
+            }catch(java.lang.InterruptedException e)
+            {
+                System.out.println("join interrupted?");
+            }
+        }
+
+        consumer_thread.interrupt();
+
+
+        writer.close();
+
+
+    }
+
+    public class Producer implements Runnable{
+
+        protected BlockingQueue queue = null;
+
+        private int file_num = 0;
+
+        public Producer(BlockingQueue queue, int file_num) {
+            this.queue = queue;
+            this.file_num = file_num;
+        }
+
+        public void run() {
+
+
+            ByteReader reader = new ByteReader(fastq_name,basepath,file_num);
+
+            StringBuilder current_dna_read = new StringBuilder("");
+            StringBuilder current_abundance_read = new StringBuilder("");
+            while(reader.hasNext())
+            {
+                do_dna_conversion(current_dna_read,current_abundance_read,reader,this.queue);
+
+            }
+
+
+
+        }
+    }
+
+    public class Consumer implements Runnable{
+
+        protected BlockingQueue queue = null;
+        DnaWriter writer = null;
+
+        public Consumer(BlockingQueue queue, DnaWriter writer) {
+            this.queue = queue;
+            this.writer = writer;
+        }
+
+        public void run() {
+
+            while(!Thread.currentThread().isInterrupted())
+            {
+                try{
+                    writer.write(queue.take());
+                }catch(java.lang.InterruptedException e)
+                {
+                    System.out.println("consumer interrupted?");
+                }
+            }
+
+
+
+        }
+    }
+
+    private void do_dna_conversion(StringBuilder current_dna_read, StringBuilder current_abundance_read, ByteReader reader, BlockingQueue queue)
+    {
+        for(int i = 0; i < 4; i++)
+        {
+            current_dna_read.append(reader.getNext());
+            if(i!=3)
+            {
+                current_dna_read.append(" ");
+            }
+        }
+
+        binary2dna(current_dna_read,31);
+
+
+
+        for(int i = 0; i < 4; i++)
+        {
+            current_abundance_read.append(reader.getNext());
+            if(i!=3)
+            {
+                current_abundance_read.append(" ");
+            }
+        }
+
+        transformed_hex_to_dec(current_abundance_read);
+
+        try{
+            queue.put(current_dna_read.append(" ").append(current_abundance_read).toString());
+
+        }catch(java.lang.InterruptedException e)
+        {
+            System.out.println("interrupted?");
+        }
+        this.line_count++;
+
+        current_abundance_read.setLength(0);
+        current_dna_read.setLength(0);
+    }
+
 
     private class DnaWriter{
         private BufferedWriter writer;
@@ -161,6 +223,15 @@ public class DnaOutput {
 
         }
 
+        public void write(Object input)
+        {
+            try{
+                writer.write(input.toString() + "\n");
+            }catch(java.io.IOException e){
+                System.out.println("write error: " + e.getMessage());
+            }
+        }
+
         public void close(){
             try{
                 writer.close();
@@ -174,43 +245,6 @@ public class DnaOutput {
     }
 
 
-//    //public Map<String, String> getDna_map() {
-//        return dna_map;
-//    }
-
-
-    /**
-     * Reads the binary file and puts all its values into a byte array.
-     * This byte array is what is eventually manipulated into dna sequences and abundances
-     *
-     * @param input
-     * @return
-     */
-    private byte[] readBytes(File input){
-        byte[] ans;
-        try{
-
-            long filesize = input.length();
-            InputStream inputstream = new FileInputStream(input);
-            byte[] allBytes = new byte[(int) filesize];
-
-
-
-            inputstream.read(allBytes);
-
-
-            inputstream.close();
-
-            return allBytes;
-
-        }catch(java.io.IOException e){
-            System.out.println(e.getMessage());
-        }
-
-        return null;
-
-
-    }
 
     /**
      * Java assumes all bytes read are in 2's complement, so if the binary form of any byte starts with a 1,
@@ -268,110 +302,8 @@ public class DnaOutput {
         return ans;
     }
 
-    /**
-     * Puts each byte into a list of strings.
-     * Also makes sure to remove any "negative" extended numbers from showing up.
-     * Ensures that every string is a 2 character string.
-     *
-     * @param input
-     * @return
-     */
-    private List<String> toStringBytes(byte[] input){
-
-        //List<String> ans = new ArrayList<>();
-        List<String> ans = new ArrayList<>(input.length);
-
-        for(int i = 0; i < input.length; i++){
-            int temp = input[i];
-            String hex = Integer.toHexString(temp);
-            //int parsed = (int) Long.parseLong(hex,16);
-
-            if(hex.length() > 2){
-                //System.out.println(unNegative(hex));
-                ans.add(unNegative(hex));
-            }else{
-                //System.out.println(extend(hex,2));
-                ans.add(extend(hex,2));
-            }
-
-        }
-
-//        Log.println(Log.INFO, "byte size", String.valueOf(input.length));
-//        Log.println(Log.INFO, "list size", String.valueOf(ans.size()));
 
 
-        return ans;
-
-    }
-
-    /**
-     * An example line that this method would read takes this form:
-     * 023c c400 3203 0400 0200 0000 0000 0000
-     *
-     * The first 4 chunks are the hexadecimal representation of the dna sequence, and the
-     * second 4 chunks are abundance.
-     *
-     * This method pairs the dna chunk to the abundance chunk for processing later
-     * @param input
-     */
-    private void pair_hex_to_abundances(List<String> input){
-
-//        DnaWriter dna_writer = null;
-//        try{
-//            dna_writer = new DnaWriter();
-//        }catch(java.io.IOException e)
-//        {
-//            System.out.println("error: " + e.getMessage());
-//        }
-
-        StringBuilder currentDnaHex = new StringBuilder("");
-        StringBuilder currentAbundanceHex = new StringBuilder("");
-        //Log.println(Log.INFO, "input", input.get(0));
-        for(int i = 1; i <= input.size(); i++)
-        {
-            int place_in_line = i%8;
-
-            if(place_in_line <= 4 && place_in_line != 0)
-            {
-                //currentDnaHex += input.get(i-1) + " ";
-                currentDnaHex.append(input.get(i-1) + " ");
-
-
-
-            }else{
-                //currentAbundanceHex += input.get(i-1) + " ";
-                currentAbundanceHex.append(input.get(i-1) + " ");
-            }
-
-            if(place_in_line == 0) // finish a line
-            {
-               //this.hex_map.put(currentDnaHex.toString(),currentAbundanceHex.toString());
-
-//                Log.println(Log.INFO, "pairing ", "DNA: " + currentDnaHex);
-//                Log.println(Log.INFO, "pairing ", "ABUNDANCE: " + currentAbundanceHex);
-
-                binary2dna(currentDnaHex,31);
-                transformed_hex_to_dec(currentAbundanceHex);
-
-                dna_writer.write(currentDnaHex,currentAbundanceHex);
-
-//                this.dna_strings.add(new StringBuilder(currentDnaHex));
-//                this.abundance_strings.add(new StringBuilder(currentAbundanceHex));
-
-
-                //currentDnaHex = "";
-                currentDnaHex.setLength(0);
-                currentAbundanceHex.setLength(0); // clear the buffers
-                //currentAbundanceHex = "";
-            }
-
-
-        }
-
-        //dna_writer.close();
-
-
-    }
 
     /**
      *This method converts the abundance hexadecimal into a decimal number.
@@ -399,7 +331,6 @@ public class DnaOutput {
             transform(transformed[i]);
         }
 
-        //String[] transformed = {transform(split[3]), transform(split[2]),transform(split[1]),transform(split[0])};
 
         StringBuilder combined = new StringBuilder("");
 
@@ -407,10 +338,10 @@ public class DnaOutput {
         {
             combined.append(transformed[i]);
         }
-        //System.out.println(combined);
+
         input.setLength(0);
         input.append(String.valueOf((Long.parseLong(combined.toString(),16))));
-        //return String.valueOf((Long.parseLong(combined.toString(),16)));
+
 
     }
 
@@ -425,11 +356,6 @@ public class DnaOutput {
     {
         String[] splitStr = input.toString().split(" ");
 
-//        if(splitStr.length != 4)
-//        {
-//            Log.println(Log.INFO, "binary2dna", "out: " + input.toString());
-//        }
-
         StringBuilder[] split = new StringBuilder[4];
         for(int i = 0; i < 4; i++)
         {
@@ -440,17 +366,6 @@ public class DnaOutput {
             base42dna(split[i]);
         }
 
-
-
-
-
-//        String[] hex = {transform(split[3]), transform(split[2]), transform(split[1]), transform(split[0])};
-//
-//        String[] base4 = {hex2base4(hex[0]),hex2base4(hex[1]),hex2base4(hex[2]),hex2base4(hex[3])};
-//
-//        String[] extended = {extend(base4[0],8),extend(base4[1],8),extend(base4[2],8),extend(base4[3],8)};
-//
-//        String[] DNA = {base42dna(extended[0]),base42dna(extended[1]),base42dna(extended[2]),base42dna(extended[3])};
 
         String ans = "";
         for(int i = 0; i < 4; i++)
@@ -471,8 +386,7 @@ public class DnaOutput {
 
     public static void transform(StringBuilder input)
     {
-//        char[] inputChars = input.toCharArray();
-//        char[] old = input.toCharArray();
+
         StringBuilder old = new StringBuilder(input);
 
 
@@ -482,13 +396,6 @@ public class DnaOutput {
         input.setCharAt(3,old.charAt(1));
 
 
-//        inputChars[0] = old[2];
-//        inputChars[1] = old[3];
-//        inputChars[2] = old[0];
-//        inputChars[3] = old[1];
-
-        //return input;
-
     }
 
     public static void hex2base4(StringBuilder input)
@@ -496,7 +403,7 @@ public class DnaOutput {
         String old = input.toString();
         input.setLength(0);
         input.append(Integer.toString(Integer.parseInt(old,16),4));
-        //return Integer.toString(Integer.parseInt(input,16),4);
+
 
     }
 
@@ -523,39 +430,21 @@ public class DnaOutput {
 
         int difference = goalSize - length;
 
-        //String original = input.toString();
 
-        //StringBuilder substr = new StringBuilder("");
 
         for(int i = 0; i < difference; i++)
         {
             input.insert(0,'0');
         }
 
-        //return substr.append(input).toString();
+
 
 
     }
 
     public static void base42dna(StringBuilder input)
     {
-        //char[] inputChars = input.toCharArray();
 
-//        for(int i = 0; i < input.length(); i++)
-//        {
-//            char currentChar = inputChars[i];
-//
-//            if(currentChar == '0')
-//                inputChars[i] = 'A';
-//            else if(currentChar == '1')
-//                inputChars[i] = 'C';
-//            else if(currentChar == '2')
-//                inputChars[i] = 'T';
-//            else if(currentChar == '3')
-//                inputChars[i] = 'G';
-//            else
-//                return "error";
-//        }
 
         for(int i = 0; i < input.length(); i++)
         {

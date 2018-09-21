@@ -18,21 +18,35 @@ import static org.junit.Assert.*;
 public class DnaOutputTest {
 
     @Test
-
-    public void working_togeher()
+    public void multithreading()
     {
         DnaOutput test = null;
 
         try{
-            test = new DnaOutput("ERR1539057", "/home/kaden/Documents/dsk/build/bin/");
+            test = new DnaOutput("ERR1539057", "/home/kaden/Documents/dsk/build/bin/",true);
 
         }catch(java.io.FileNotFoundException e)
         {
             System.out.println(e.getMessage());
         }
-
-
     }
+
+//    @Test
+//
+//    public void working_togeher()
+//    {
+//        DnaOutput test = null;
+//
+//        try{
+//            test = new DnaOutput("ERR1539057", "/home/kaden/Documents/dsk/build/bin/");
+//
+//        }catch(java.io.FileNotFoundException e)
+//        {
+//            System.out.println(e.getMessage());
+//        }
+//
+//
+//    }
 
 //    @Test
 //    public void firstAndLastTest(){

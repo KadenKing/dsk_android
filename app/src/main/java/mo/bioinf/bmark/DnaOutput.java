@@ -13,7 +13,7 @@ public class DnaOutput {
 
 
   /*** multithreading objects ****/
-  BlockingQueue bqueue = new ArrayBlockingQueue(1024);
+  BlockingQueue bqueue = new ArrayBlockingQueue(1024*10);
   boolean reading_done = false;
 
 
@@ -120,6 +120,7 @@ public class DnaOutput {
             StringBuilder current_abundance_read = new StringBuilder("");
             while(reader.hasNext())
             {
+                //System.out.println("Thread " + file_num + " going.");
                 do_dna_conversion(current_dna_read,current_abundance_read,reader,this.queue);
 
             }

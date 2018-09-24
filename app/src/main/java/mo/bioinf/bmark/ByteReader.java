@@ -12,13 +12,20 @@ import java.util.Queue;
 
 public class ByteReader {
 
+
+    /**** multithreading things ***/
+
+
+    /*******************************/
+
+
     private boolean has_next_line;
     private boolean second_to_last = false;
 
     private String next = "";
 
     private Queue<File> solids_queue = new LinkedList<File>();
-    private byte[] current_bytes;
+    private byte[] current_bytes = new byte[16];
     private int byte_index = 0;
 
 

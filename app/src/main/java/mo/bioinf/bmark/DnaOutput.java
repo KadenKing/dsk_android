@@ -1,4 +1,6 @@
 package mo.bioinf.bmark;
+import android.util.Log;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -13,7 +15,7 @@ public class DnaOutput {
 
 
   /*** multithreading objects ****/
-  BlockingQueue bqueue = new ArrayBlockingQueue(1024*1000);
+  BlockingQueue bqueue = new ArrayBlockingQueue(1024*10);
   boolean reading_done = false;
 
 
@@ -94,6 +96,13 @@ public class DnaOutput {
 
         consumer_thread.interrupt();
 
+        try{
+            consumer_thread.join();
+        }catch(java.lang.InterruptedException e)
+        {
+
+        }
+
 
         writer.close();
 
@@ -149,8 +158,11 @@ public class DnaOutput {
                 }catch(java.lang.InterruptedException e)
                 {
                     System.out.println("consumer interrupted?");
+                    System.out.println("queue remaining: " + this.queue.size());
                 }
             }
+
+            System.out.println("can get here");
 
 
 
@@ -201,18 +213,18 @@ public class DnaOutput {
 
 
     private class DnaWriter{
-        private BufferedWriter writer;
+        private BufferedWriter writer = null;
 
 
         DnaWriter(){
             String path = basepath + fastq_name + "_dna.txt";
-
+            Log.println(Log.INFO, "dna writer path", path);
             File file = new File(path);
             try{
                 writer = new BufferedWriter(new FileWriter(path));
             }catch(java.io.IOException e)
             {
-                System.out.println("error" + e.getMessage());
+                System.out.println("io exception writer" + e.getMessage());
             }
 
         }

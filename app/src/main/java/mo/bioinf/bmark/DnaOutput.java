@@ -140,7 +140,7 @@ public class DnaOutput {
 
         DnaWriter(){
             String path = basepath + fastq_name + "_dna.txt";
-
+            Log.println(Log.INFO, "dna writer path", path);
             File file = new File(path);
             try{
                 writer = new BufferedWriter(new FileWriter(path));

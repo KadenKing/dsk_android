@@ -13,7 +13,7 @@ public class DnaOutput {
 
 
   /*** multithreading objects ****/
-  BlockingQueue bqueue = new ArrayBlockingQueue(1024*10);
+  BlockingQueue bqueue = new ArrayBlockingQueue(1024*1000);
   boolean reading_done = false;
 
 
@@ -75,7 +75,7 @@ public class DnaOutput {
         consumer_thread.start();
 
         List<Thread> producer_list = new ArrayList<>();
-        for(int i = 0; i < 4; i++)
+        for(int i = 0; i < 8; i++)
         {
             Thread newthread = new Thread(new Producer(this.bqueue,i));
             newthread.start();
@@ -159,9 +159,12 @@ public class DnaOutput {
 
     private void do_dna_conversion(StringBuilder current_dna_read, StringBuilder current_abundance_read, ByteReader reader, BlockingQueue queue)
     {
+
+
         for(int i = 0; i < 4; i++)
         {
             current_dna_read.append(reader.getNext());
+
             if(i!=3)
             {
                 current_dna_read.append(" ");
@@ -279,29 +282,7 @@ public class DnaOutput {
      * @param input
      * @return
      */
-    private List<String> create_blocks_of_4(List<String> input){
-        List<String> ans = new ArrayList<>(input.size()/2);
-        StringBuilder currentStr = new StringBuilder("");
-        for(int i = 1; i <= input.size(); i++)
-        {
-            //currentStr += input.get(i-1);
-            currentStr.append(input.get(i-1));
-            if(i%2 == 0)
-            {
-                ans.add(currentStr.toString());
-                //currentStr = "";
-                currentStr.setLength(0); // clear string builder
 
-
-                
-            }
-        }
-
-//        Log.println(Log.INFO, "input size", String.valueOf(input.size()));
-//        Log.println(Log.INFO, "output size", String.valueOf(ans.size()));
-
-        return ans;
-    }
 
 
 

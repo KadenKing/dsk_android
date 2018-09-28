@@ -24,7 +24,7 @@ public class DnaOutputTest {
         DnaOutput test = null;
 
         try{
-            test = new DnaOutput("SRR6037114", "/media/kaden/AC8883A98883709E/dsk/build/bin/", true);
+            test = new DnaOutput("ERR2625614", "/media/kaden/AC8883A98883709E/dsk/build/bin/", true);
 
         }catch(java.io.FileNotFoundException e)
         {

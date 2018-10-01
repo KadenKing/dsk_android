@@ -13,9 +13,10 @@ import java.util.concurrent.BlockingQueue;
 
 public class DnaOutput {
 
+    final int BUFFER = 1024*100;
 
   /*** multithreading objects ****/
-  BlockingQueue bqueue = new ArrayBlockingQueue(1024*10);
+  BlockingQueue bqueue = new ArrayBlockingQueue(BUFFER);
   boolean reading_done = false;
 
 
@@ -94,14 +95,18 @@ public class DnaOutput {
             }
         }
 
+        while(!this.bqueue.isEmpty()){ //busy wait until queue is empty
+            System.out.println("waiting on queue to empty, size: "+ bqueue.size());
+        }
+
         consumer_thread.interrupt();
 
-        try{
-            consumer_thread.join();
-        }catch(java.lang.InterruptedException e)
-        {
-
-        }
+//        try{
+//            consumer_thread.join();
+//        }catch(java.lang.InterruptedException e)
+//        {
+//
+//        }
 
 
         writer.close();
@@ -221,7 +226,7 @@ public class DnaOutput {
             Log.println(Log.INFO, "dna writer path", path);
             File file = new File(path);
             try{
-                writer = new BufferedWriter(new FileWriter(path));
+                writer = new BufferedWriter(new FileWriter(path),BUFFER);
             }catch(java.io.IOException e)
             {
                 System.out.println("io exception writer" + e.getMessage());

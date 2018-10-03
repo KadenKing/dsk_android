@@ -80,12 +80,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         if(data != null){
-//            DSK_Options returnParcel = data.getParcelableExtra("returnParcel");
-//
-//            returnParcel.setFullPath(parcel.getFullPath());
-//            returnParcel.setFilename(parcel.getFilename());
-//            returnParcel.setDevicePath(parcel.getDevicePath());
-//            parcel = returnParcel;
+
 
 
             final TextView tv = (TextView) findViewById(R.id.sample_text);

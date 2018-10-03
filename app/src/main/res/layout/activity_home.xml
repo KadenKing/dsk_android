@@ -7,55 +7,15 @@
     android:layout_height="match_parent">
 
 
-
-    <!--<ImageButton-->
-        <!--android:id="@+id/imageButton4"-->
-        <!--android:layout_width="105dp"-->
-        <!--android:layout_height="85dp"-->
-        <!--android:layout_marginStart="8dp"-->
-        <!--android:layout_marginEnd="8dp"-->
-        <!--android:layout_marginBottom="48dp"-->
-        <!--app:layout_constraintBottom_toBottomOf="parent"-->
-        <!--app:layout_constraintEnd_toEndOf="parent"-->
-        <!--app:layout_constraintHorizontal_bias="0.501"-->
-        <!--app:layout_constraintStart_toStartOf="parent"-->
-        <!--app:srcCompat="@android:color/background_dark" />-->
-
-    <!--<ImageButton-->
-        <!--android:id="@+id/imageButton3"-->
-        <!--android:layout_width="105dp"-->
-        <!--android:layout_height="85dp"-->
-        <!--android:layout_marginStart="8dp"-->
-        <!--android:layout_marginTop="48dp"-->
-        <!--android:layout_marginEnd="8dp"-->
-        <!--app:layout_constraintEnd_toEndOf="parent"-->
-        <!--app:layout_constraintHorizontal_bias="0.501"-->
-        <!--app:layout_constraintStart_toStartOf="parent"-->
-        <!--app:layout_constraintTop_toTopOf="parent"-->
-        <!--app:srcCompat="@android:color/background_dark" />-->
-
-    <!--<ImageButton-->
-        <!--android:id="@+id/imageButton2"-->
-        <!--android:layout_width="105dp"-->
-        <!--android:layout_height="85dp"-->
-        <!--android:layout_marginStart="8dp"-->
-        <!--android:layout_marginTop="8dp"-->
-        <!--android:layout_marginEnd="8dp"-->
-        <!--android:layout_marginBottom="8dp"-->
-        <!--app:layout_constraintBottom_toTopOf="@+id/imageButton4"-->
-        <!--app:layout_constraintEnd_toEndOf="parent"-->
-        <!--app:layout_constraintHorizontal_bias="0.501"-->
-        <!--app:layout_constraintStart_toStartOf="parent"-->
-        <!--app:layout_constraintTop_toBottomOf="@+id/imageButton3"-->
-        <!--app:srcCompat="@android:color/background_dark" />-->
-
-    <android.support.design.widget.BottomNavigationView
-        xmlns:android="http://schemas.android.com/apk/res/android"
+    <android.support.design.widget.BottomNavigationView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/navigation"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:layout_gravity="start"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:menu="@menu/navigation_items" />
 
 </android.support.constraint.ConstraintLayout>

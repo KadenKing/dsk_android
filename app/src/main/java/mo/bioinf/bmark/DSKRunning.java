@@ -21,21 +21,21 @@ public class DSKRunning extends AppCompatActivity {
 
 
 
-        final DSK_Options parcel = getIntent().getParcelableExtra("parcel");
+        //final DSK_Options parcel = getIntent().getParcelableExtra("parcel");
 
 
         final Runnable DSK = new Runnable(){
             @Override
             public void run(){
                 /*** sending the actual parsel to the jni is a nightmare so for now we're sending it piece by piece ***/
-                String runtime = stringFromJNI(parcel.getFullPath(),parcel.getDevicePath(), parcel.getFilename(), parcel.getKmer(),
-                                                parcel.getMemory(),parcel.getDisk(),parcel.getRepartition_type(),parcel.getMinimizer_type());
+                String runtime = stringFromJNI(DSK_Options.getFullPath(),DSK_Options.getDevicePath(), DSK_Options.getFilename(), DSK_Options.getKmer(),
+                        DSK_Options.getMemory(),DSK_Options.getDisk(),DSK_Options.getRepartition_type(),DSK_Options.getMinimizer_type());
                 /******************************************************************************************************/
 
                 /*** send the runtime and the filename to the results activity to show the results ***/
                 Intent results_intent = new Intent(getBaseContext(),ResultsActivity.class);
                 results_intent.putExtra("runtime", runtime);
-                results_intent.putExtra("filename", parcel.getFilename());
+                results_intent.putExtra("filename", DSK_Options.getFilename());
                 DSKRunning.this.startActivity(results_intent);
                 /*************************************************************************************/
 

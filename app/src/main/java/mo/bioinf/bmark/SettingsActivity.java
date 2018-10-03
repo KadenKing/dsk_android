@@ -68,11 +68,16 @@ public class SettingsActivity extends AppCompatActivity {
                 String minimizerStr = minimizer_spinner.getSelectedItem().toString();
                 String repartitionStr = repartition_spinner.getSelectedItem().toString();
 
-                DSK_Options returnParcel = new DSK_Options(kmer,memory,disk,repartition2int(repartitionStr),minimizer2int(minimizerStr));
+                //DSK_Options returnParcel = new DSK_Options(kmer,memory,disk,repartition2int(repartitionStr),minimizer2int(minimizerStr));
+                DSK_Options.setKmer(kmer);
+                DSK_Options.setMemory(memory);
+                DSK_Options.setDisk(disk);
+                DSK_Options.setMinimizer_type(minimizer2int(minimizerStr));
+                DSK_Options.setRepartition_type(repartition2int(repartitionStr));
 
                 Intent result = new Intent();
 
-                result.putExtra("returnParcel",returnParcel);
+                //result.putExtra("returnParcel",returnParcel);
                 setResult(Activity.RESULT_OK, result);
                 finish();
             }

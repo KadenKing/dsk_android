@@ -3,11 +3,8 @@ package mo.bioinf.bmark;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 
 public class DSKRunning extends AppCompatActivity {
     // Used to load the 'native-lib' library on application startup.
@@ -24,7 +21,7 @@ public class DSKRunning extends AppCompatActivity {
 
 
 
-        final DSK_Parcel parcel = getIntent().getParcelableExtra("parcel");
+        final DSK_Options parcel = getIntent().getParcelableExtra("parcel");
 
 
         final Runnable DSK = new Runnable(){

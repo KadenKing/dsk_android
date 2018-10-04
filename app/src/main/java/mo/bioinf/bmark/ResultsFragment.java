@@ -114,16 +114,10 @@ public class ResultsFragment extends Fragment {
                 /************************/
 
 
-                /*** determines what the name of the histogram should be, opens it, and reads it into the view ***/
-
-                //Map<String,String> dna_map = dna_output.getDna_map();
+                /*** puts some debug information about the dna decompression into the view ***/
 
                 results_view.append(dna_output.line_count + " lines written to file in " + runtime + " milliseconds");
-//
-//                for(Map.Entry<String,String> entry : dna_map.entrySet())
-//                {
-//                    results_view.append(entry.getKey() + " " + entry.getValue() + "\n");
-//                }
+
                 /****************************************************************************************************/
             }
         };

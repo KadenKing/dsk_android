@@ -6,9 +6,15 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+
+import java.io.File;
 
 
 /**
@@ -28,6 +34,23 @@ public class DSKRunningFragment extends Fragment {
     public native String stringFromJNI(String path, String base_path, String filename, int kmer, int memory, int disk, int repartition_type, int minimizer_type);
 
 
+    public boolean solids_exist(){
+
+
+        String pathStr = DSK_Options.getDevicePath() + "/" + DSK_Options.getFilename() + "_gatb";
+
+        File file = new File(pathStr);
+
+        if(file.exists())
+        {
+            return true;
+        }else{
+            return false;
+        }
+
+        //System.out.println(path);
+
+    }
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -65,6 +88,14 @@ public class DSKRunningFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if(solids_exist())
+        {
+            getFragmentManager().popBackStackImmediate();
+            Log.println(Log.INFO, "running fragment", "found solids");
+        }
+
+
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -92,7 +123,20 @@ public class DSKRunningFragment extends Fragment {
 //                DSKRunning.this.startActivity(results_intent);
                 /*************************************************************************************/
 
-                getFragmentManager().popBackStackImmediate();
+                getFragmentManager().popBackStack();
+                Bundle bundle = new Bundle();
+                bundle.putString("runtime", runtime);
+
+                Fragment fragment = new ResultsFragment();
+                fragment.setArguments(bundle);
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.fragment_container,fragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+
+
+
 
             }
         };

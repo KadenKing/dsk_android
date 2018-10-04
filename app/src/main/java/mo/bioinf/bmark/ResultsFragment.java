@@ -7,6 +7,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
 
 
 /**
@@ -64,7 +66,29 @@ public class ResultsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_results, container, false);
+
+        final View returnView = inflater.inflate(R.layout.activity_results, container, false);;
+
+        /**** ui element instances ***/
+        final Button done_button = (Button) returnView.findViewById(R.id.finished_button);
+        final Button read_dna_button = (Button) returnView.findViewById(R.id.dna_button);
+        final TextView tv = (TextView) returnView.findViewById(R.id.time_text);
+        final TextView results_view = (TextView) returnView.findViewById(R.id.histogram);
+
+        //set results text
+        final String results = getArguments().getString("runtime");
+        final String filename = DSK_Options.getFilename();
+        /***********************************************/
+        tv.setText(results);
+
+
+        done_button.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+                getFragmentManager().popBackStack();
+            }
+        });
+
+        return returnView;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -74,16 +98,7 @@ public class ResultsFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
+
 
     @Override
     public void onDetach() {

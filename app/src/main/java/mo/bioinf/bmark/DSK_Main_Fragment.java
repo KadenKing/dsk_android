@@ -233,6 +233,18 @@ public class DSK_Main_Fragment extends Fragment {
 //                    results_intent.putExtra("runtime", "already run");
 //                    results_intent.putExtra("filename", DSK_Options.getFilename());
 //                    MainActivity.this.startActivity(results_intent);
+
+                    Bundle bundle = new Bundle();
+                    bundle.putString("runtime", "already run");
+
+
+                    Fragment fragment = new ResultsFragment();
+                    fragment.setArguments(bundle);
+                    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.replace(R.id.fragment_container,fragment);
+                    fragmentTransaction.addToBackStack(null);
+                    fragmentTransaction.commit();
                 }else{
 //                    Intent dskIntent = new Intent(getBaseContext(),DSKRunning.class);
 //                    //dskIntent.putExtra("parcel",DSK_Options);

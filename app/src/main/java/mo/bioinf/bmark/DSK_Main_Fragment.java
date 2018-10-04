@@ -268,6 +268,33 @@ public class DSK_Main_Fragment extends Fragment {
         });
         /****************/
 
+        delete_button.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+
+                String filename = DSK_Options.getFilename();
+                String device_path = DSK_Options.getDevicePath();
+                String path = device_path + "/" + filename + "_gatb";
+
+                File folder = new File(path);
+
+                String[] files = folder.list();
+
+                for(String file : files)
+                {
+                    Log.println(Log.INFO,"deleting", "trying to delete " + path + "/" + file);
+                    File about_to_delete = new File(path + "/" + file);
+                    about_to_delete.delete();
+                }
+
+                folder.delete();
+
+                delete_button.setEnabled(false);
+
+            }
+
+
+        });
+
 
         return rootView;
     }

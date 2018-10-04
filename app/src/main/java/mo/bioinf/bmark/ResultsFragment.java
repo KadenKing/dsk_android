@@ -3,7 +3,9 @@ package mo.bioinf.bmark;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -85,6 +87,53 @@ public class ResultsFragment extends Fragment {
         done_button.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
                 getFragmentManager().popBackStack();
+            }
+        });
+
+        final Runnable read_dna_runner = new Runnable() {
+            @Override
+            public void run() {
+                final String base_path = getActivity().getFilesDir().getAbsolutePath().toString() + "/";
+                /*** making dna output ***/
+                DnaOutput dna_output = null;
+                long runtime = 0;
+                try{
+                    long startTime = System.nanoTime();
+                    Log.println(Log.INFO,"filename", filename);
+                    Log.println(Log.INFO,"base_path", base_path);
+                    dna_output = new DnaOutput(filename, base_path,true);
+                    long endTime = System.nanoTime();
+                    runtime = endTime - startTime;
+                    runtime /= 1000000;
+
+
+                }catch(java.io.FileNotFoundException e){
+                    System.out.println(e.getMessage());
+                }
+
+                /************************/
+
+
+                /*** determines what the name of the histogram should be, opens it, and reads it into the view ***/
+
+                //Map<String,String> dna_map = dna_output.getDna_map();
+
+                results_view.append(dna_output.line_count + " lines written to file in " + runtime + " milliseconds");
+//
+//                for(Map.Entry<String,String> entry : dna_map.entrySet())
+//                {
+//                    results_view.append(entry.getKey() + " " + entry.getValue() + "\n");
+//                }
+                /****************************************************************************************************/
+            }
+        };
+
+        final Handler handler = new Handler();
+
+        read_dna_button.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+                handler.post(read_dna_runner);
+
             }
         });
 

@@ -57,7 +57,7 @@ using namespace std;
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_mo_bioinf_bmark_DSKRunning_stringFromJNI(JNIEnv *env, jobject instance, jstring path, jstring base_path,jstring filename, jint kmer, jint memory, jint disk, jint repartition_type, jint minimizer_type) {
+Java_mo_bioinf_bmark_DSKRunningFragment_stringFromJNI(JNIEnv *env, jobject instance, jstring path, jstring base_path,jstring filename, jint kmer, jint memory, jint disk, jint repartition_type, jint minimizer_type) {
 
     /***converting jstrings to c++ strings*****/
     const char *str = (*env).GetStringUTFChars(path,0);

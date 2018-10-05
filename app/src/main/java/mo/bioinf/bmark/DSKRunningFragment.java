@@ -130,7 +130,7 @@ public class DSKRunningFragment extends Fragment {
 //                Intent results_intent = new Intent(getBaseContext(),ResultsActivity_deprecated.class);
 //                results_intent.putExtra("runtime", runtime);
 //                results_intent.putExtra("filename", DSK_Options.getFilename());
-//                DSKRunning.this.startActivity(results_intent);
+//                DSKRunning_deprecated.this.startActivity(results_intent);
                 /*************************************************************************************/
 
                 getFragmentManager().popBackStack();

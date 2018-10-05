@@ -216,7 +216,7 @@ public class DSK_Main_Fragment extends Fragment {
                     next_fragment(new ResultsFragment(),bundle);
 
                 }else{
-//                    Intent dskIntent = new Intent(getBaseContext(),DSKRunning.class);
+//                    Intent dskIntent = new Intent(getBaseContext(),DSKRunning_deprecated.class);
 //                    //dskIntent.putExtra("parcel",DSK_Options);
 //
 //                    MainActivity_deprecated.this.startActivity(dskIntent);

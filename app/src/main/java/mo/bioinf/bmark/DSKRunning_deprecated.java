@@ -6,7 +6,7 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-public class DSKRunning extends AppCompatActivity {
+public class DSKRunning_deprecated extends AppCompatActivity {
     // Used to load the 'native-lib' library on application startup.
     static {
         System.loadLibrary("dsk");
@@ -36,7 +36,7 @@ public class DSKRunning extends AppCompatActivity {
                 Intent results_intent = new Intent(getBaseContext(),ResultsActivity_deprecated.class);
                 results_intent.putExtra("runtime", runtime);
                 results_intent.putExtra("filename", DSK_Options.getFilename());
-                DSKRunning.this.startActivity(results_intent);
+                DSKRunning_deprecated.this.startActivity(results_intent);
                 /*************************************************************************************/
 
 

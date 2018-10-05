@@ -20,7 +20,7 @@
             android:label="@string/title_activity_settings"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".DSKRunning"
+            android:name=".DSKRunning_deprecated"
             android:label="@string/title_activity_dskrunning"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity

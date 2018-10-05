@@ -173,7 +173,7 @@ public class MainActivity_deprecated extends AppCompatActivity {
                     results_intent.putExtra("filename", DSK_Options.getFilename());
                     MainActivity_deprecated.this.startActivity(results_intent);
                 }else{
-                    Intent dskIntent = new Intent(getBaseContext(),DSKRunning.class);
+                    Intent dskIntent = new Intent(getBaseContext(),DSKRunning_deprecated.class);
                     //dskIntent.putExtra("parcel",DSK_Options);
 
                     MainActivity_deprecated.this.startActivity(dskIntent);

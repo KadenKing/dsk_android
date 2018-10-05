@@ -53,6 +53,15 @@ public class DSK_Main_Fragment extends Fragment {
     private Spinner dropdown = null;
     private ImageButton settings_button = null;
     private Button delete_button = null;
+
+
+
+    private TextView tv_kmer = null;
+    private TextView tv_memory = null;
+    private TextView tv_disk = null;
+    //private TextView tv_path = null;
+    private TextView tv_rep_type = null;
+    private TextView tv_min_type = null;
     /*******************************/
 
 
@@ -101,11 +110,19 @@ public class DSK_Main_Fragment extends Fragment {
         /*** instances of ui widgets ***/
         rootView = inflater.inflate(R.layout.activity_main, container, false);
 
-        tv = (TextView) rootView.findViewById(R.id.sample_text);
+        //tv = (TextView) rootView.findViewById(R.id.sample_text);
         run = (Button) rootView.findViewById(R.id.run_button);
         dropdown = (Spinner) rootView.findViewById(R.id.fastq_files);
         settings_button = (ImageButton) rootView.findViewById(R.id.settings_button);
         delete_button = (Button) rootView.findViewById(R.id.delete_button);
+
+        tv_kmer = rootView.findViewById(R.id.tv_kmer);
+        tv_memory = rootView.findViewById(R.id.tv_memory);
+        tv_disk = rootView.findViewById(R.id.tv_disk);
+        //tv_path = rootView.findViewById(R.id.tv_path);
+        tv_rep_type = rootView.findViewById(R.id.tv_rep);
+        tv_min_type = rootView.findViewById(R.id.tv_min);
+
         /*******************************/
 
         run.setEnabled(false); // enabled later when the file path is verified
@@ -132,15 +149,21 @@ public class DSK_Main_Fragment extends Fragment {
 
     void updateTV(){
 
-
-        String text = "kmer: " + DSK_Options.getKmer() + "\n" +
-                "memory: " + DSK_Options.getMemory() + "\n" +
-                " disk: " + DSK_Options.getDisk() + "\n" +
-                "path: " + DSK_Options.getFullPath() + "\n" +
-                "repartition type: " + DSK_Options.repartition2string() + "\n" +
-                "minimizer type: " + DSK_Options.minimizer2string() + "\n";
-        System.out.println(" hey: " + text);
-        tv.setText(text);
+//
+//        String text = "kmer: " + DSK_Options.getKmer() + "\n" +
+//                "memory: " + DSK_Options.getMemory() + "\n" +
+//                " disk: " + DSK_Options.getDisk() + "\n" +
+//                "path: " + DSK_Options.getFullPath() + "\n" +
+//                "repartition type: " + DSK_Options.repartition2string() + "\n" +
+//                "minimizer type: " + DSK_Options.minimizer2string() + "\n";
+//        System.out.println(" hey: " + text);
+//        tv.setText(text);
+        tv_kmer.setText(String.valueOf(DSK_Options.getKmer()));
+        tv_memory.setText(String.valueOf(DSK_Options.getMemory()));
+        tv_disk.setText(String.valueOf(DSK_Options.getDisk()));
+        //tv_path.setText(DSK_Options.getFullPath());
+        tv_rep_type.setText(DSK_Options.repartition2string());
+        tv_min_type.setText(DSK_Options.minimizer2string());
     }
 
     void populateDropdown(Context context, Spinner dropdown, String base_path){
@@ -175,7 +198,7 @@ public class DSK_Main_Fragment extends Fragment {
 
 
 
-                final TextView tv = (TextView) rootView.findViewById(R.id.sample_text);
+                //final TextView tv = (TextView) rootView.findViewById(R.id.sample_text);
                 updateTV();
 
             }
@@ -339,6 +362,8 @@ public class DSK_Main_Fragment extends Fragment {
         initialize_run_dsk_button();
 
         initialize_delete_files_button();
+
+        updateTV();
 
 
         return rootView;

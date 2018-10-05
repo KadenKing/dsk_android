@@ -71,8 +71,7 @@ public class DSK_Main_Fragment extends Fragment {
                 String selectedItem = parent.getItemAtPosition(position).toString();
                 DSK_Options.setFilename(selectedItem);
                 DSK_Options.setFullPath(base_path + selectedItem);
-                updateTV(tv, DSK_Options.getKmer(),DSK_Options.getMemory(), DSK_Options.getDisk(),DSK_Options.getFullPath(),
-                        DSK_Options.getRepartition_type(), DSK_Options.getMinimizer_type());
+                updateTV();
 
 
                 checkForSolids(selectedItem,DSK_Options.getFullPath());
@@ -85,6 +84,7 @@ public class DSK_Main_Fragment extends Fragment {
             } // to close the onItemSelected
             public void onNothingSelected(AdapterView<?> parent)
             {
+                updateTV();
 
             }
         });
@@ -130,13 +130,16 @@ public class DSK_Main_Fragment extends Fragment {
 
     }
 
-    void updateTV(TextView tv, int kmer, int memory, int disk, String path, int repartition_type, int minimizer_type){
-        String text = "kmer: " + kmer + "\n" +
-                "memory: " + memory + "\n" +
-                " disk: " + disk + "\n" +
-                "path: " + path + "\n" +
+    void updateTV(){
+
+
+        String text = "kmer: " + DSK_Options.getKmer() + "\n" +
+                "memory: " + DSK_Options.getMemory() + "\n" +
+                " disk: " + DSK_Options.getDisk() + "\n" +
+                "path: " + DSK_Options.getFullPath() + "\n" +
                 "repartition type: " + DSK_Options.repartition2string() + "\n" +
                 "minimizer type: " + DSK_Options.minimizer2string() + "\n";
+        System.out.println(" hey: " + text);
         tv.setText(text);
     }
 
@@ -170,9 +173,10 @@ public class DSK_Main_Fragment extends Fragment {
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
 
+
+
                 final TextView tv = (TextView) rootView.findViewById(R.id.sample_text);
-                updateTV(tv, DSK_Options.getKmer(),DSK_Options.getMemory(), DSK_Options.getDisk(),DSK_Options.getFullPath(),
-                        DSK_Options.getRepartition_type(), DSK_Options.getMinimizer_type());
+                updateTV();
 
             }
         });
@@ -322,6 +326,7 @@ public class DSK_Main_Fragment extends Fragment {
         // Inflate the layout for this fragment
         //final Context context = getActivity();
 
+        Log.println(Log.INFO,"on create view", "run");
 
         initialize_ui(inflater,container);
 

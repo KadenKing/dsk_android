@@ -179,6 +179,25 @@ public class DSK_Main_Fragment extends Fragment {
         /***********************************/
     }
 
+    private void next_fragment(Fragment input, Bundle bundle){
+        Fragment fragment = input;
+        fragment.setArguments(bundle);
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container,fragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+    }
+
+    private void next_fragment(Fragment input){
+        Fragment fragment = input;
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container,fragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+    }
+
     private void initialize_run_dsk_button(){
         /*** run DSK ***/
         run.setOnClickListener(new View.OnClickListener(){
@@ -194,26 +213,15 @@ public class DSK_Main_Fragment extends Fragment {
                     Bundle bundle = new Bundle();
                     bundle.putString("runtime", "already run");
 
+                    next_fragment(new ResultsFragment(),bundle);
 
-                    Fragment fragment = new ResultsFragment();
-                    fragment.setArguments(bundle);
-                    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.fragment_container,fragment);
-                    fragmentTransaction.addToBackStack(null);
-                    fragmentTransaction.commit();
                 }else{
 //                    Intent dskIntent = new Intent(getBaseContext(),DSKRunning.class);
 //                    //dskIntent.putExtra("parcel",DSK_Options);
 //
 //                    MainActivity.this.startActivity(dskIntent);
 
-                    Fragment fragment = new DSKRunningFragment();
-                    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.fragment_container,fragment);
-                    fragmentTransaction.addToBackStack(null);
-                    fragmentTransaction.commit();
+                    next_fragment(new DSKRunningFragment());
 
                 }
 

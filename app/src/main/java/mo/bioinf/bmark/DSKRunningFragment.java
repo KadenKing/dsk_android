@@ -52,6 +52,16 @@ public class DSKRunningFragment extends Fragment {
 
     }
 
+    private void next_fragment(Fragment input, Bundle bundle){
+        Fragment fragment = input;
+        fragment.setArguments(bundle);
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container,fragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+    }
+
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -127,13 +137,9 @@ public class DSKRunningFragment extends Fragment {
                 Bundle bundle = new Bundle();
                 bundle.putString("runtime", runtime);
 
-                Fragment fragment = new ResultsFragment();
-                fragment.setArguments(bundle);
-                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.fragment_container,fragment);
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
+                next_fragment(new ResultsFragment(), bundle);
+
+
 
 
 

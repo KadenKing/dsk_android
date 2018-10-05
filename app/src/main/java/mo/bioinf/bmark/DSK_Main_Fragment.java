@@ -39,6 +39,11 @@ import java.util.List;
 public class DSK_Main_Fragment extends Fragment {
 
 
+    /***** instance variables ****/
+
+    String base_path = "";
+
+    /****************************/
 
     /*** instances of ui widgets ***/
     private View rootView = null;
@@ -65,7 +70,7 @@ public class DSK_Main_Fragment extends Fragment {
             {
                 String selectedItem = parent.getItemAtPosition(position).toString();
                 DSK_Options.setFilename(selectedItem);
-                DSK_Options.setFullPath(DSK_Options.getFullPath()  + selectedItem);
+                DSK_Options.setFullPath(base_path + selectedItem);
                 updateTV(tv, DSK_Options.getKmer(),DSK_Options.getMemory(), DSK_Options.getDisk(),DSK_Options.getFullPath(),
                         DSK_Options.getRepartition_type(), DSK_Options.getMinimizer_type());
 
@@ -86,7 +91,7 @@ public class DSK_Main_Fragment extends Fragment {
     }
 
     private void find_path_information(){
-        final String base_path = getActivity().getFilesDir().getAbsolutePath().toString() + "/fastq/"; // this phone's working directory
+        base_path = getActivity().getFilesDir().getAbsolutePath().toString() + "/fastq/"; // this phone's working directory
         DSK_Options.setDevicePath(getActivity().getFilesDir().getAbsolutePath().toString());
         DSK_Options.setFullPath(base_path);
     }
@@ -153,6 +158,103 @@ public class DSK_Main_Fragment extends Fragment {
         dropdown.setAdapter(adapter);
     }
 
+    private void initialize_settings_button(){
+        /*** open settings fragment ***/
+        settings_button.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+
+                Fragment fragment = new SettingsFragment();
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.fragment_container,fragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+
+                final TextView tv = (TextView) rootView.findViewById(R.id.sample_text);
+                updateTV(tv, DSK_Options.getKmer(),DSK_Options.getMemory(), DSK_Options.getDisk(),DSK_Options.getFullPath(),
+                        DSK_Options.getRepartition_type(), DSK_Options.getMinimizer_type());
+
+            }
+        });
+        /***********************************/
+    }
+
+    private void initialize_run_dsk_button(){
+        /*** run DSK ***/
+        run.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+                File solids_folder = new File(DSK_Options.getDevicePath() + "/" + DSK_Options.getFilename() + "_gatb");
+                if(solids_folder.exists())
+                {
+//                    Intent results_intent = new Intent(getBaseContext(),ResultsActivity.class);
+//                    results_intent.putExtra("runtime", "already run");
+//                    results_intent.putExtra("filename", DSK_Options.getFilename());
+//                    MainActivity.this.startActivity(results_intent);
+
+                    Bundle bundle = new Bundle();
+                    bundle.putString("runtime", "already run");
+
+
+                    Fragment fragment = new ResultsFragment();
+                    fragment.setArguments(bundle);
+                    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.replace(R.id.fragment_container,fragment);
+                    fragmentTransaction.addToBackStack(null);
+                    fragmentTransaction.commit();
+                }else{
+//                    Intent dskIntent = new Intent(getBaseContext(),DSKRunning.class);
+//                    //dskIntent.putExtra("parcel",DSK_Options);
+//
+//                    MainActivity.this.startActivity(dskIntent);
+
+                    Fragment fragment = new DSKRunningFragment();
+                    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.replace(R.id.fragment_container,fragment);
+                    fragmentTransaction.addToBackStack(null);
+                    fragmentTransaction.commit();
+
+                }
+
+
+
+
+
+            }
+        });
+        /****************/
+    }
+
+    private void initialize_delete_files_button(){
+        delete_button.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+
+                String filename = DSK_Options.getFilename();
+                String device_path = DSK_Options.getDevicePath();
+                String path = device_path + "/" + filename + "_gatb";
+
+                File folder = new File(path);
+
+                String[] files = folder.list();
+
+                for(String file : files)
+                {
+                    Log.println(Log.INFO,"deleting", "trying to delete " + path + "/" + file);
+                    File about_to_delete = new File(path + "/" + file);
+                    about_to_delete.delete();
+                }
+
+                folder.delete();
+
+                delete_button.setEnabled(false);
+
+            }
+
+
+        });
+    }
+
 
     /**************/
 
@@ -210,7 +312,7 @@ public class DSK_Main_Fragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        final Context context = getActivity();
+        //final Context context = getActivity();
 
 
         initialize_ui(inflater,container);
@@ -219,103 +321,11 @@ public class DSK_Main_Fragment extends Fragment {
 
         initialize_dropdown();
 
+        initialize_settings_button();
 
-        /*** open settings fragment ***/
-        settings_button.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v){
+        initialize_run_dsk_button();
 
-                //Intent myIntent = new Intent(getBaseContext(), SettingsActivity.class);
-                //myIntent.putExtra("parcel",DSK_Options);
-
-                //MainActivity.this.startActivityForResult(myIntent,1);
-
-                Fragment fragment = new SettingsFragment();
-                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.fragment_container,fragment);
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
-
-                final TextView tv = (TextView) rootView.findViewById(R.id.sample_text);
-                updateTV(tv, DSK_Options.getKmer(),DSK_Options.getMemory(), DSK_Options.getDisk(),DSK_Options.getFullPath(),
-                        DSK_Options.getRepartition_type(), DSK_Options.getMinimizer_type());
-
-            }
-        });
-        /***********************************/
-
-
-        /*** run DSK ***/
-        run.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v){
-                File solids_folder = new File(DSK_Options.getDevicePath() + "/" + DSK_Options.getFilename() + "_gatb");
-                if(solids_folder.exists())
-                {
-//                    Intent results_intent = new Intent(getBaseContext(),ResultsActivity.class);
-//                    results_intent.putExtra("runtime", "already run");
-//                    results_intent.putExtra("filename", DSK_Options.getFilename());
-//                    MainActivity.this.startActivity(results_intent);
-
-                    Bundle bundle = new Bundle();
-                    bundle.putString("runtime", "already run");
-
-
-                    Fragment fragment = new ResultsFragment();
-                    fragment.setArguments(bundle);
-                    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.fragment_container,fragment);
-                    fragmentTransaction.addToBackStack(null);
-                    fragmentTransaction.commit();
-                }else{
-//                    Intent dskIntent = new Intent(getBaseContext(),DSKRunning.class);
-//                    //dskIntent.putExtra("parcel",DSK_Options);
-//
-//                    MainActivity.this.startActivity(dskIntent);
-
-                    Fragment fragment = new DSKRunningFragment();
-                    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.fragment_container,fragment);
-                    fragmentTransaction.addToBackStack(null);
-                    fragmentTransaction.commit();
-
-                }
-
-
-
-
-
-            }
-        });
-        /****************/
-
-        delete_button.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v){
-
-                String filename = DSK_Options.getFilename();
-                String device_path = DSK_Options.getDevicePath();
-                String path = device_path + "/" + filename + "_gatb";
-
-                File folder = new File(path);
-
-                String[] files = folder.list();
-
-                for(String file : files)
-                {
-                    Log.println(Log.INFO,"deleting", "trying to delete " + path + "/" + file);
-                    File about_to_delete = new File(path + "/" + file);
-                    about_to_delete.delete();
-                }
-
-                folder.delete();
-
-                delete_button.setEnabled(false);
-
-            }
-
-
-        });
+        initialize_delete_files_button();
 
 
         return rootView;

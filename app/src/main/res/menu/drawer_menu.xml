@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/drawer_files"
+            android:icon="@drawable/ic_dashboard_black_24dp"
+            android:title="files" />
+        <item
+            android:id="@+id/nav_gallery"
+            android:icon="@drawable/ic_dashboard_black_24dp"
+            android:title="temp2" />
+        <item
+            android:id="@+id/nav_slideshow"
+            android:icon="@drawable/ic_dashboard_black_24dp"
+            android:title="temp3" />
+        <item
+            android:id="@+id/nav_manage"
+            android:icon="@drawable/ic_dashboard_black_24dp"
+            android:title="temp4" />
+    </group>
+</menu>

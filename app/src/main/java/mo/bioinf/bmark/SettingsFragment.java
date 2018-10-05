@@ -25,6 +25,29 @@ import android.widget.Spinner;
 public class SettingsFragment extends Fragment {
 
 
+    /*** ui instances ***/
+    private View returnView = null;
+
+    private EditText num_disk = null;
+    private EditText num_kmer = null;
+    private EditText num_mem = null;
+    private Button done_button = null;
+    private Spinner minimizer_spinner = null;
+    private Spinner repartition_spinner = null;
+    /*********************/
+
+    private void initialize_ui_instances(LayoutInflater inflater, ViewGroup container){
+        /*** input widget instances ****/
+        returnView = inflater.inflate(R.layout.activity_settings, container, false);
+
+         num_disk = (EditText) returnView.findViewById(R.id.num_disk);
+         num_kmer = (EditText) returnView.findViewById(R.id.num_kmer);
+         num_mem = (EditText) returnView.findViewById(R.id.num_memory);
+         done_button = (Button) returnView.findViewById(R.id.done_button);
+         minimizer_spinner = (Spinner) returnView.findViewById(R.id.minimizer_spinner);
+         repartition_spinner = (Spinner) returnView.findViewById(R.id.repartition_spinner);
+        /*******************************/
+    }
 
     private int minimizer2int(String input)
     {
@@ -44,6 +67,44 @@ public class SettingsFragment extends Fragment {
             return 1;
 
         return -1;
+    }
+
+    private void set_ui_to_current_values(){
+        /*** set the input fields to their current values ***/
+        num_kmer.setText(String.valueOf(DSK_Options.getKmer()));
+        num_disk.setText(String.valueOf(DSK_Options.getDisk()));
+        num_mem.setText(String.valueOf(DSK_Options.getMemory()));
+        minimizer_spinner.setSelection(DSK_Options.getMinimizer_type());
+        repartition_spinner.setSelection(DSK_Options.getRepartition_type());
+        /****************************************************/
+    }
+
+    private void initialize_done_button(){
+        /*** send settings information back to MainActivity_deprecated ***/
+        done_button.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+                int kmer = Integer.parseInt(num_kmer.getText().toString());
+                int memory = Integer.parseInt(num_mem.getText().toString());
+                int disk = Integer.parseInt(num_disk.getText().toString());
+                String minimizerStr = minimizer_spinner.getSelectedItem().toString();
+                String repartitionStr = repartition_spinner.getSelectedItem().toString();
+
+                //DSK_Options returnParcel = new DSK_Options(kmer,memory,disk,repartition2int(repartitionStr),minimizer2int(minimizerStr));
+                DSK_Options.setKmer(kmer);
+                DSK_Options.setMemory(memory);
+                DSK_Options.setDisk(disk);
+                DSK_Options.setMinimizer_type(minimizer2int(minimizerStr));
+                DSK_Options.setRepartition_type(repartition2int(repartitionStr));
+
+//                Intent result = new Intent();
+//
+//                //result.putExtra("returnParcel",returnParcel);
+//                setResult(Activity.RESULT_OK, result);
+//                finish();
+                getFragmentManager().popBackStackImmediate();
+            }
+        });
+        /************************************************************/
     }
 
 
@@ -94,50 +155,13 @@ public class SettingsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-        View returnView = inflater.inflate(R.layout.activity_settings, container, false);
 
-        /*** input widget instances ****/
-        final EditText num_disk = (EditText) returnView.findViewById(R.id.num_disk);
-        final EditText num_kmer = (EditText) returnView.findViewById(R.id.num_kmer);
-        final EditText num_mem = (EditText) returnView.findViewById(R.id.num_memory);
-        final Button done_button = (Button) returnView.findViewById(R.id.done_button);
-        final Spinner minimizer_spinner = (Spinner) returnView.findViewById(R.id.minimizer_spinner);
-        final Spinner repartition_spinner = (Spinner) returnView.findViewById(R.id.repartition_spinner);
-        /*******************************/
 
-        /*** set the input fields to their current values ***/
-        num_kmer.setText(String.valueOf(DSK_Options.getKmer()));
-        num_disk.setText(String.valueOf(DSK_Options.getDisk()));
-        num_mem.setText(String.valueOf(DSK_Options.getMemory()));
-        minimizer_spinner.setSelection(DSK_Options.getMinimizer_type());
-        repartition_spinner.setSelection(DSK_Options.getRepartition_type());
-        /****************************************************/
+        initialize_ui_instances(inflater,container);
 
-        /*** send settings information back to MainActivity ***/
-        done_button.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v){
-                int kmer = Integer.parseInt(num_kmer.getText().toString());
-                int memory = Integer.parseInt(num_mem.getText().toString());
-                int disk = Integer.parseInt(num_disk.getText().toString());
-                String minimizerStr = minimizer_spinner.getSelectedItem().toString();
-                String repartitionStr = repartition_spinner.getSelectedItem().toString();
+        set_ui_to_current_values();
 
-                //DSK_Options returnParcel = new DSK_Options(kmer,memory,disk,repartition2int(repartitionStr),minimizer2int(minimizerStr));
-                DSK_Options.setKmer(kmer);
-                DSK_Options.setMemory(memory);
-                DSK_Options.setDisk(disk);
-                DSK_Options.setMinimizer_type(minimizer2int(minimizerStr));
-                DSK_Options.setRepartition_type(repartition2int(repartitionStr));
-
-//                Intent result = new Intent();
-//
-//                //result.putExtra("returnParcel",returnParcel);
-//                setResult(Activity.RESULT_OK, result);
-//                finish();
-                getFragmentManager().popBackStackImmediate();
-            }
-        });
-        /************************************************************/
+        initialize_done_button();
 
 
         return returnView;

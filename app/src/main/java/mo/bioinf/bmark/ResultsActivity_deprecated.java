@@ -18,7 +18,7 @@ import java.io.File;
 import java.util.Map;
 import java.util.Scanner;
 
-public class ResultsActivity extends AppCompatActivity {
+public class ResultsActivity_deprecated extends AppCompatActivity {
 
 
 

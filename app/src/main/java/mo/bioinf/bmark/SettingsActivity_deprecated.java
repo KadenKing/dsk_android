@@ -9,7 +9,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity_deprecated extends AppCompatActivity {
 
     private int minimizer2int(String input)
     {
@@ -59,7 +59,7 @@ public class SettingsActivity extends AppCompatActivity {
         /****************************************************/
 
 
-        /*** send settings information back to MainActivity ***/
+        /*** send settings information back to MainActivity_deprecated ***/
         done_button.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
                 int kmer = Integer.parseInt(num_kmer.getText().toString());

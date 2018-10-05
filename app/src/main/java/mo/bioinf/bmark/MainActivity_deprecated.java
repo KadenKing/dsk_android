@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity_deprecated extends AppCompatActivity {
 
     //private DSK_Options parcel = new DSK_Options();
 
@@ -83,9 +83,9 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-            final TextView tv = (TextView) findViewById(R.id.sample_text);
-            updateTV(tv, DSK_Options.getKmer(),DSK_Options.getMemory(), DSK_Options.getDisk(),DSK_Options.getFullPath(),
-                    DSK_Options.getRepartition_type(), DSK_Options.getMinimizer_type());
+            //final TextView tv = (TextView) findViewById(R.id.sample_text);
+//            updateTV(tv, DSK_Options.getKmer(),DSK_Options.getMemory(), DSK_Options.getDisk(),DSK_Options.getFullPath(),
+//                    DSK_Options.getRepartition_type(), DSK_Options.getMinimizer_type());
         }
 
 
@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
         final Context context = this;
 
         /*** instances of ui widgets ***/
-        final TextView tv = (TextView) findViewById(R.id.sample_text);
+        //final TextView tv = (TextView) findViewById(R.id.sample_text);
         final Button run = (Button) findViewById(R.id.run_button);
         final Spinner dropdown = (Spinner) findViewById(R.id.fastq_files);
         final ImageButton settings_button = (ImageButton) findViewById(R.id.settings_button);
@@ -128,8 +128,8 @@ public class MainActivity extends AppCompatActivity {
                 String selectedItem = parent.getItemAtPosition(position).toString();
                 DSK_Options.setFilename(selectedItem);
                 DSK_Options.setFullPath(base_path  + selectedItem);
-                updateTV(tv, DSK_Options.getKmer(),DSK_Options.getMemory(), DSK_Options.getDisk(),DSK_Options.getFullPath(),
-                        DSK_Options.getRepartition_type(), DSK_Options.getMinimizer_type());
+//                updateTV(tv, DSK_Options.getKmer(),DSK_Options.getMemory(), DSK_Options.getDisk(),DSK_Options.getFullPath(),
+//                        DSK_Options.getRepartition_type(), DSK_Options.getMinimizer_type());
 
 
                 checkForSolids(selectedItem,base_path);
@@ -151,10 +151,10 @@ public class MainActivity extends AppCompatActivity {
         settings_button.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
 
-                Intent myIntent = new Intent(getBaseContext(), SettingsActivity.class);
+                Intent myIntent = new Intent(getBaseContext(), SettingsActivity_deprecated.class);
                 //myIntent.putExtra("parcel",DSK_Options);
 
-                MainActivity.this.startActivityForResult(myIntent,1);
+                MainActivity_deprecated.this.startActivityForResult(myIntent,1);
 
 
 
@@ -168,15 +168,15 @@ public class MainActivity extends AppCompatActivity {
                 File solids_folder = new File(DSK_Options.getDevicePath() + "/" + DSK_Options.getFilename() + "_gatb");
                 if(solids_folder.exists())
                 {
-                    Intent results_intent = new Intent(getBaseContext(),ResultsActivity.class);
+                    Intent results_intent = new Intent(getBaseContext(),ResultsActivity_deprecated.class);
                     results_intent.putExtra("runtime", "already run");
                     results_intent.putExtra("filename", DSK_Options.getFilename());
-                    MainActivity.this.startActivity(results_intent);
+                    MainActivity_deprecated.this.startActivity(results_intent);
                 }else{
-                    Intent dskIntent = new Intent(getBaseContext(),DSKRunning.class);
+                    Intent dskIntent = new Intent(getBaseContext(),DSKRunning_deprecated.class);
                     //dskIntent.putExtra("parcel",DSK_Options);
 
-                    MainActivity.this.startActivity(dskIntent);
+                    MainActivity_deprecated.this.startActivity(dskIntent);
                 }
 
 

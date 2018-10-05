@@ -38,9 +38,75 @@ import java.util.List;
  */
 public class DSK_Main_Fragment extends Fragment {
 
-    /**** Code that runs what the view of the fragment does ***/
 
-    public void checkForSolids(String filename, String base_path){
+
+    /*** instances of ui widgets ***/
+    private View rootView = null;
+
+    private TextView tv = null;
+    private Button run = null;
+    private Spinner dropdown = null;
+    private ImageButton settings_button = null;
+    private Button delete_button = null;
+    /*******************************/
+
+
+    private void initialize_dropdown(){
+        populateDropdown(getActivity(), dropdown, DSK_Options.getFullPath()); // fills the dropdown with the files in the fastq folder
+
+        /** path[] is an array because a work-around is needed to edit a variable from within the anonymous method
+         */
+        final String path[] = {DSK_Options.getFullPath()};
+
+        /*current file path is updated and shown on the text view */
+        dropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+        {
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
+            {
+                String selectedItem = parent.getItemAtPosition(position).toString();
+                DSK_Options.setFilename(selectedItem);
+                DSK_Options.setFullPath(DSK_Options.getFullPath()  + selectedItem);
+                updateTV(tv, DSK_Options.getKmer(),DSK_Options.getMemory(), DSK_Options.getDisk(),DSK_Options.getFullPath(),
+                        DSK_Options.getRepartition_type(), DSK_Options.getMinimizer_type());
+
+
+                checkForSolids(selectedItem,DSK_Options.getFullPath());
+                /*makes sure that if we press the run button the app won't crash due to a file permission error*/
+                checkPermission();
+                if (tryOpenFile(getActivity(),DSK_Options.getFullPath()) && isExternalStorageReadable() && isExternalStorageWritable()) {
+                    run.setEnabled(true);
+                }
+
+            } // to close the onItemSelected
+            public void onNothingSelected(AdapterView<?> parent)
+            {
+
+            }
+        });
+    }
+
+    private void find_path_information(){
+        final String base_path = getActivity().getFilesDir().getAbsolutePath().toString() + "/fastq/"; // this phone's working directory
+        DSK_Options.setDevicePath(getActivity().getFilesDir().getAbsolutePath().toString());
+        DSK_Options.setFullPath(base_path);
+    }
+
+
+    private void initialize_ui(LayoutInflater inflater, ViewGroup container){
+        /*** instances of ui widgets ***/
+        rootView = inflater.inflate(R.layout.activity_main, container, false);
+
+        tv = (TextView) rootView.findViewById(R.id.sample_text);
+        run = (Button) rootView.findViewById(R.id.run_button);
+        dropdown = (Spinner) rootView.findViewById(R.id.fastq_files);
+        settings_button = (ImageButton) rootView.findViewById(R.id.settings_button);
+        delete_button = (Button) rootView.findViewById(R.id.delete_button);
+        /*******************************/
+
+        run.setEnabled(false); // enabled later when the file path is verified
+    }
+
+    private void checkForSolids(String filename, String base_path){
         final Button delete_button = (Button) getView().findViewById(R.id.delete_button);
 
         String pathStr = DSK_Options.getDevicePath() + "/" + DSK_Options.getFilename() + "_gatb";
@@ -144,59 +210,15 @@ public class DSK_Main_Fragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        final View rootView = inflater.inflate(R.layout.activity_main, container, false);
-
-
         final Context context = getActivity();
 
 
-        /*** instances of ui widgets ***/
-        final TextView tv = (TextView) rootView.findViewById(R.id.sample_text);
-        final Button run = (Button) rootView.findViewById(R.id.run_button);
-        final Spinner dropdown = (Spinner) rootView.findViewById(R.id.fastq_files);
-        final ImageButton settings_button = (ImageButton) rootView.findViewById(R.id.settings_button);
-        final Button delete_button = (Button) rootView.findViewById(R.id.delete_button);
-        /*******************************/
+        initialize_ui(inflater,container);
 
-        run.setEnabled(false); // enabled later when the file path is verified
+        find_path_information();
 
-        final String base_path = getActivity().getFilesDir().getAbsolutePath().toString() + "/fastq/"; // this phone's working directory
-        DSK_Options.setDevicePath(getActivity().getFilesDir().getAbsolutePath().toString());
-        DSK_Options.setFullPath(base_path);
+        initialize_dropdown();
 
-        populateDropdown(getActivity(), dropdown, base_path); // fills the dropdown with the files in the fastq folder
-
-
-
-        /** path[] is an array because a work-around is needed to edit a variable from within the anonymous method
-         */
-        final String path[] = {base_path};
-
-        /*current file path is updated and shown on the text view */
-        dropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
-        {
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
-            {
-                String selectedItem = parent.getItemAtPosition(position).toString();
-                DSK_Options.setFilename(selectedItem);
-                DSK_Options.setFullPath(base_path  + selectedItem);
-                updateTV(tv, DSK_Options.getKmer(),DSK_Options.getMemory(), DSK_Options.getDisk(),DSK_Options.getFullPath(),
-                        DSK_Options.getRepartition_type(), DSK_Options.getMinimizer_type());
-
-
-                checkForSolids(selectedItem,base_path);
-                /*makes sure that if we press the run button the app won't crash due to a file permission error*/
-                checkPermission();
-                if (tryOpenFile(context,DSK_Options.getFullPath()) && isExternalStorageReadable() && isExternalStorageWritable()) {
-                    run.setEnabled(true);
-                }
-
-            } // to close the onItemSelected
-            public void onNothingSelected(AdapterView<?> parent)
-            {
-
-            }
-        });
 
         /*** open settings fragment ***/
         settings_button.setOnClickListener(new View.OnClickListener(){

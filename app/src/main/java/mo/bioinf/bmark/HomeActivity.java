@@ -23,6 +23,17 @@ public class HomeActivity extends AppCompatActivity {
     private TextView mTextMessage;
 
 
+    private void set_action_bar()
+    {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionbar = getSupportActionBar();
+        actionbar.setDisplayHomeAsUpEnabled(true);
+        actionbar.setHomeAsUpIndicator(R.drawable.ic_menu);
+        getSupportActionBar().setTitle("");
+
+    }
+
     private boolean loadFragment(Fragment fragment) {
         //switching fragment
         if (fragment != null) {
@@ -69,30 +80,14 @@ public class HomeActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_home2);
 
-//        Toolbar toolbar = findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        ActionBar actionbar = getSupportActionBar();
-        actionbar.setDisplayHomeAsUpEnabled(true);
-        actionbar.setHomeAsUpIndicator(R.drawable.ic_menu);
+        set_action_bar(); // put drawer toolbar with drawer button as the action bar
 
-        mDrawerLayout = findViewById(R.id.drawer_layout);
-
-        getSupportActionBar().setTitle("");
+        mDrawerLayout = findViewById(R.id.drawer_layout); // reference to the drawer layout
 
 
 
-
-
-
-
-
-
-
-
-        loadFragment(new DSK_Main_Fragment());
+        loadFragment(new DSK_Main_Fragment()); // load the DSK fragment by default
 
         //mTextMessage = (TextView) findViewById(R.id.message);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);

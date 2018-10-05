@@ -40,12 +40,12 @@ public class SettingsFragment extends Fragment {
         /*** input widget instances ****/
         returnView = inflater.inflate(R.layout.activity_settings, container, false);
 
-         EditText num_disk = (EditText) returnView.findViewById(R.id.num_disk);
-         EditText num_kmer = (EditText) returnView.findViewById(R.id.num_kmer);
-         EditText num_mem = (EditText) returnView.findViewById(R.id.num_memory);
-         Button done_button = (Button) returnView.findViewById(R.id.done_button);
-         Spinner minimizer_spinner = (Spinner) returnView.findViewById(R.id.minimizer_spinner);
-         Spinner repartition_spinner = (Spinner) returnView.findViewById(R.id.repartition_spinner);
+         num_disk = (EditText) returnView.findViewById(R.id.num_disk);
+         num_kmer = (EditText) returnView.findViewById(R.id.num_kmer);
+         num_mem = (EditText) returnView.findViewById(R.id.num_memory);
+         done_button = (Button) returnView.findViewById(R.id.done_button);
+         minimizer_spinner = (Spinner) returnView.findViewById(R.id.minimizer_spinner);
+         repartition_spinner = (Spinner) returnView.findViewById(R.id.repartition_spinner);
         /*******************************/
     }
 
@@ -162,9 +162,6 @@ public class SettingsFragment extends Fragment {
         set_ui_to_current_values();
 
         initialize_done_button();
-
-
-
 
 
         return returnView;

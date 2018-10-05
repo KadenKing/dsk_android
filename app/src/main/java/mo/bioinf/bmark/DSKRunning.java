@@ -33,7 +33,7 @@ public class DSKRunning extends AppCompatActivity {
                 /******************************************************************************************************/
 
                 /*** send the runtime and the filename to the results activity to show the results ***/
-                Intent results_intent = new Intent(getBaseContext(),ResultsActivity.class);
+                Intent results_intent = new Intent(getBaseContext(),ResultsActivity_deprecated.class);
                 results_intent.putExtra("runtime", runtime);
                 results_intent.putExtra("filename", DSK_Options.getFilename());
                 DSKRunning.this.startActivity(results_intent);

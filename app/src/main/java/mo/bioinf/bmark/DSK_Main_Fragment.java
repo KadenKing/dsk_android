@@ -205,10 +205,10 @@ public class DSK_Main_Fragment extends Fragment {
                 File solids_folder = new File(DSK_Options.getDevicePath() + "/" + DSK_Options.getFilename() + "_gatb");
                 if(solids_folder.exists())
                 {
-//                    Intent results_intent = new Intent(getBaseContext(),ResultsActivity.class);
+//                    Intent results_intent = new Intent(getBaseContext(),ResultsActivity_deprecated.class);
 //                    results_intent.putExtra("runtime", "already run");
 //                    results_intent.putExtra("filename", DSK_Options.getFilename());
-//                    MainActivity.this.startActivity(results_intent);
+//                    MainActivity_deprecated.this.startActivity(results_intent);
 
                     Bundle bundle = new Bundle();
                     bundle.putString("runtime", "already run");
@@ -219,7 +219,7 @@ public class DSK_Main_Fragment extends Fragment {
 //                    Intent dskIntent = new Intent(getBaseContext(),DSKRunning.class);
 //                    //dskIntent.putExtra("parcel",DSK_Options);
 //
-//                    MainActivity.this.startActivity(dskIntent);
+//                    MainActivity_deprecated.this.startActivity(dskIntent);
 
                     next_fragment(new DSKRunningFragment());
 

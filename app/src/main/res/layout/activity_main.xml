@@ -12,7 +12,7 @@
         android:id="@+id/not_running"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="mo.bioinf.bmark.MainActivity">
+        tools:context="mo.bioinf.bmark.MainActivity_deprecated">
 
         <TextView
             android:id="@+id/sample_text"

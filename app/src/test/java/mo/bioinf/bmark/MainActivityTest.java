@@ -8,7 +8,7 @@ public class MainActivityTest {
 
     @Test
     public void checkSolidsTest(){
-        //MainActivity.checkForSolids("file.fastq", "/home/here");
+        //MainActivity_deprecated.checkForSolids("file.fastq", "/home/here");
 
 
 

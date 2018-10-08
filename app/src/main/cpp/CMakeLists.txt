@@ -66,6 +66,8 @@ include_directories (${gatb-core-includes})
 # We add the path for extra libraries
 link_directories (${gatb-core-extra-libraries-path})
 
+add_subdirectory(${PROJECT_SOURCE_DIR}/kraken)
+
 set (PROGRAM_SOURCE_DIR ${PROJECT_SOURCE_DIR}/src)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
@@ -75,6 +77,8 @@ add_library(${PROJECT_NAME} SHARED ${ProjectFiles})
 find_library(log-lib log)
 set(LIBBS ${gatb-core-libraries} ${log-lib})
 target_link_libraries(${PROJECT_NAME} ${LIBBS})
+
+
 
 
 

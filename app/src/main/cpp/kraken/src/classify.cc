@@ -14,6 +14,7 @@
 #include "aa_translate.h"
 #include "reports.h"
 #include "utilities.h"
+//#include "nostdio.h"
 
 using std::cout;
 using std::cerr;
@@ -189,21 +190,21 @@ void ReportStats(struct timeval time1, struct timeval time2,
 
   uint64_t total_unclassified = stats.total_sequences - stats.total_classified;
 
-  if (isatty(fileno(stderr)))
-    cerr << "\r";
-  fprintf(stderr,
-          "%llu sequences (%.2f Mbp) processed in %.3fs (%.1f Kseq/m, %.2f Mbp/m).\n",
-          (unsigned long long) stats.total_sequences,
-          stats.total_bases / 1.0e6,
-          seconds,
-          stats.total_sequences / 1.0e3 / (seconds / 60),
-          stats.total_bases / 1.0e6 / (seconds / 60) );
-  fprintf(stderr, "  %llu sequences classified (%.2f%%)\n",
-          (unsigned long long) stats.total_classified,
-          stats.total_classified * 100.0 / stats.total_sequences);
-  fprintf(stderr, "  %llu sequences unclassified (%.2f%%)\n",
-          (unsigned long long) total_unclassified,
-          total_unclassified * 100.0 / stats.total_sequences);
+//  if (isatty(fileno(stderr)))
+//    cerr << "\r";
+//  fprintf(stderr,
+//          "%llu sequences (%.2f Mbp) processed in %.3fs (%.1f Kseq/m, %.2f Mbp/m).\n",
+//          (unsigned long long) stats.total_sequences,
+//          stats.total_bases / 1.0e6,
+//          seconds,
+//          stats.total_sequences / 1.0e3 / (seconds / 60),
+//          stats.total_bases / 1.0e6 / (seconds / 60) );
+//  fprintf(stderr, "  %llu sequences classified (%.2f%%)\n",
+//          (unsigned long long) stats.total_classified,
+//          stats.total_classified * 100.0 / stats.total_sequences);
+//  fprintf(stderr, "  %llu sequences unclassified (%.2f%%)\n",
+//          (unsigned long long) total_unclassified,
+//          total_unclassified * 100.0 / stats.total_sequences);
 }
 
 void ProcessFiles(const char *filename1, const char *filename2,
@@ -337,9 +338,9 @@ void ProcessFiles(const char *filename1, const char *filename2,
 
       #pragma omp critical(output_stats)
       {
-        if (isatty(fileno(stderr)))
-          cerr << "\rProcessed " << stats.total_sequences
-               << " sequences (" << stats.total_bases << " bp) ...";
+//        if (isatty(fileno(stderr)))
+//          cerr << "\rProcessed " << stats.total_sequences
+//               << " sequences (" << stats.total_bases << " bp) ...";
       }
 
       #pragma omp critical(update_calls)

@@ -14,7 +14,6 @@
 #include "aa_translate.h"
 #include "reports.h"
 #include "utilities.h"
-//#include "nostdio.h"
 
 using std::cout;
 using std::cerr;
@@ -189,7 +188,7 @@ void ReportStats(struct timeval time1, struct timeval time2,
   seconds += time2.tv_sec;
 
   uint64_t total_unclassified = stats.total_sequences - stats.total_classified;
-
+//
 //  if (isatty(fileno(stderr)))
 //    cerr << "\r";
 //  fprintf(stderr,

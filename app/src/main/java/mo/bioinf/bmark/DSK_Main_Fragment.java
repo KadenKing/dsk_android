@@ -1,10 +1,12 @@
 package mo.bioinf.bmark;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
@@ -100,7 +102,15 @@ public class DSK_Main_Fragment extends Fragment {
     }
 
     private void find_path_information(){
-        base_path = getActivity().getFilesDir().getAbsolutePath().toString() + "/fastq/"; // this phone's working directory
+
+
+
+
+        //Log.println(Log.INFO,"externaldir", extern_dir.getAbsolutePath());
+
+        Log.println(Log.INFO, "removable?", String.valueOf(Environment.isExternalStorageRemovable()));
+
+        base_path = "/storage/0799-15A9/Android/fastq/"; // this phone's working directory
         DSK_Options.setDevicePath(getActivity().getFilesDir().getAbsolutePath().toString());
         DSK_Options.setFullPath(base_path);
     }
@@ -170,6 +180,8 @@ public class DSK_Main_Fragment extends Fragment {
         /*gets this phone's directory within the application*/
 
         File fastq_folder = new File(base_path);
+        Log.println(Log.DEBUG,"base_path", base_path);
+        Log.println(Log.DEBUG,"permission", String.valueOf(checkPermissionForReadExtertalStorage()));
         File[] fastq_files = fastq_folder.listFiles();
         List<String> fastq_file_names = new ArrayList<String>();
         for(File fastq_file : fastq_files)
@@ -334,7 +346,17 @@ public class DSK_Main_Fragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+//        try{
+//            requestPermissionForReadExtertalStorage();
+//        }catch(java.lang.Exception e){
+//            Log.println(Log.DEBUG, "ext storage read", "error");
+//        }
 
+        try{
+            requestPermissionForWriteExtertalStorage();
+        }catch(java.lang.Exception e){
+            Log.println(Log.DEBUG, "ext storage read", "error");
+        }
 
 
         if (getArguments() != null) {
@@ -350,6 +372,18 @@ public class DSK_Main_Fragment extends Fragment {
         //final Context context = getActivity();
 
         Log.println(Log.INFO,"on create view", "run");
+
+
+
+//        if(!checkPermissionForReadExtertalStorage())
+//        {
+//            try{
+//                requestPermissionForReadExtertalStorage();
+//            }catch(java.lang.Exception e){
+//                Log.println(Log.DEBUG, "ext storage read", "error");
+//            }
+//
+//        }
 
         initialize_ui(inflater,container);
 
@@ -479,6 +513,36 @@ public class DSK_Main_Fragment extends Fragment {
         boolean exists = file.exists();
         return  file.exists();
 
+    }
+
+    public boolean checkPermissionForReadExtertalStorage() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            int result = getContext().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
+            return result == PackageManager.PERMISSION_GRANTED;
+        }
+        return false;
+    }
+
+    public void requestPermissionForReadExtertalStorage() throws Exception {
+        try {
+            ActivityCompat.requestPermissions((Activity) getContext(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    0x3);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    public static final int REQUEST_WRITE_STORAGE = 112;
+
+    public void requestPermissionForWriteExtertalStorage() throws Exception {
+        try {
+            ActivityCompat.requestPermissions((Activity) getContext(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    REQUEST_WRITE_STORAGE);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 
 

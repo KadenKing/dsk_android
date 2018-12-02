@@ -6,8 +6,8 @@ import android.os.Parcelable;
 public abstract class DSK_Options {
 
     static private int kmer = 31;
-    static private int memory = 5000;
-    static private int disk = 50000;
+    static private int memory = 2300;
+    static private int disk = 150000;
     static private String devicePath = "";
     static private String fullPath = "";
     static private int repartition_type = 0;

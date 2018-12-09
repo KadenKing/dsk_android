@@ -1,7 +1,9 @@
 package mo.bioinf.bmark;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -11,6 +13,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 
 /**
@@ -76,6 +84,7 @@ public class ResultsFragment extends Fragment {
         final Button read_dna_button = (Button) returnView.findViewById(R.id.dna_button);
         final TextView tv = (TextView) returnView.findViewById(R.id.time_text);
         final TextView results_view = (TextView) returnView.findViewById(R.id.histogram);
+        final Button move_button = (Button) returnView.findViewById(R.id.move_button);
 
         //set results text
         final String results = getArguments().getString("runtime");
@@ -129,6 +138,54 @@ public class ResultsFragment extends Fragment {
                 handler.post(read_dna_runner);
 
             }
+        });
+
+        move_button.setOnClickListener(new View.OnClickListener(){
+            @TargetApi(Build.VERSION_CODES.O)
+            public void onClick(View v){
+
+                String filename = DSK_Options.getFilename();
+                String device_path = DSK_Options.getDevicePath();
+                String path = device_path + "/" + filename + "_gatb";
+
+                String to_path = "/sdcard/dsk_output/" + filename + "_gatb/";
+                File to_directory = new File(to_path);
+
+                if(!to_directory.exists())
+                {
+                    to_directory.mkdirs();
+                }
+
+                File folder = new File(path);
+
+                String[] files = folder.list();
+
+                for(String file : files)
+                {
+
+                    Log.println(Log.INFO,"moving", "trying to move " + path + "/" + file);
+
+
+
+
+                    File about_to_move = new File(path + "/" + file);
+
+                    try{
+                        Path result = Files.move(Paths.get(about_to_move.getAbsolutePath()),Paths.get(to_path + file));
+                    }catch(IOException e){
+                        Log.println(Log.INFO,"move error", e.getMessage());
+                    }
+
+
+
+
+                }
+
+
+
+            }
+
+
         });
 
         return returnView;
